@@ -86,6 +86,7 @@ class Analyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       std::vector<std::vector<float>> jet_daughter_phi;
       std::vector<std::vector<int>> jet_daughter_ch;
       std::vector<std::vector<float>> jet_daughter_mass;
+      std::vector<std::vector<int>> jet_daughter_pdgid;
 
       std::vector<float> fatjet_e;
       std::vector<float> fatjet_pt;
@@ -99,6 +100,10 @@ class Analyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       std::vector<std::vector<float>> fatjet_daughter_phi;
       std::vector<std::vector<int>> fatjet_daughter_ch;
       std::vector<std::vector<float>> fatjet_daughter_mass;
+      std::vector<std::vector<int>> fatjet_daughter_pdgid;
+      std::vector<float> fatjet_tau1;
+      std::vector<float> fatjet_tau2;
+      std::vector<float> fatjet_tau3;
 };
 
 //
@@ -146,6 +151,8 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("jet_daughter_ch")->SetTitle("Jet Daughter Charge");
    mtree->Branch("jet_daughter_mass",&jet_daughter_mass);
    mtree->GetBranch("jet_daughter_mass")->SetTitle("Jet Daughter Mass");
+   mtree->Branch("jet_daughter_pdgid",&jet_daughter_pdgid);
+   mtree->GetBranch("jet_daughter_pdgid")->SetTitle("Jet Daughter PdgID");
 
    mtree->Branch("numberfatjet",&numfatjet);
    mtree->GetBranch("numberfatjet")->SetTitle("Number of Fatjets");
@@ -173,6 +180,14 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("fatjet_daughter_ch")->SetTitle("Fatjet Daughter Charge");
    mtree->Branch("fatjet_daughter_mass",&fatjet_daughter_mass);
    mtree->GetBranch("fatjet_daughter_mass")->SetTitle("Fatjet Daughter Mass");
+   mtree->Branch("fatjet_daughter_pdgid",&fatjet_daughter_pdgid);
+   mtree->GetBranch("fatjet_daughter_pdgid")->SetTitle("Fatjet Daughter PdgID");
+   mtree->Branch("fatjet_tau1",&fatjet_tau1);
+   mtree->GetBranch("fatjet_tau1")->SetTitle("N-subjettiness tau_1 of Fatjet");
+   mtree->Branch("fatjet_tau2",&fatjet_tau2);
+   mtree->GetBranch("fatjet_tau2")->SetTitle("N-subjettiness tau_2 of Fatjet");
+   mtree->Branch("fatjet_tau3",&fatjet_tau3);
+   mtree->GetBranch("fatjet_tau3")->SetTitle("N-subjettiness tau_3 of Fatjet");
 
 }
 
@@ -214,6 +229,7 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jet_daughter_phi.clear();
    jet_daughter_ch.clear();
    jet_daughter_mass.clear();
+   jet_daughter_pdgid.clear();
 
    numfatjet = 0;
    fatjet_e.clear();
@@ -228,6 +244,10 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    fatjet_daughter_phi.clear();
    fatjet_daughter_ch.clear();
    fatjet_daughter_mass.clear();
+   fatjet_daughter_pdgid.clear();
+   fatjet_tau1.clear();
+   fatjet_tau2.clear();
+   fatjet_tau3.clear();
 
    if(jets.isValid()){
       for (const pat::Jet &jet : *jets){
@@ -244,6 +264,7 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          jet_daughter_phi.push_back({});
          jet_daughter_ch.push_back({});
          jet_daughter_mass.push_back({});
+         jet_daughter_pdgid.push_back({});
          ++numjet;
          const size_t num_daughter = jet.numberOfDaughters();
          for(size_t d=0; d<num_daughter; d++){
@@ -254,6 +275,7 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             jet_daughter_phi.back().push_back(Daughter->phi());
             jet_daughter_ch.back().push_back(Daughter->charge());
             jet_daughter_mass.back().push_back(Daughter->mass());
+            jet_daughter_pdgid.back().push_back(Daughter->pdgId());
          }
       } 
    }
@@ -273,16 +295,34 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          fatjet_daughter_phi.push_back({});
          fatjet_daughter_ch.push_back({});
          fatjet_daughter_mass.push_back({});
+         fatjet_daughter_pdgid.push_back({});
+         fatjet_tau1.push_back((double)uncorrFatjet.userFloat("NjettinessAK8:tau1"));
+         fatjet_tau2.push_back((double)uncorrFatjet.userFloat("NjettinessAK8:tau2"));
+         fatjet_tau3.push_back((double)uncorrFatjet.userFloat("NjettinessAK8:tau3"));
          ++numfatjet;
          const size_t num_daughter = fatjet.numberOfDaughters();
          for(size_t d=0; d<num_daughter; d++){
             const reco::Candidate * Daughter = fatjet.daughter(d);
-            fatjet_daughter_e.back().push_back(Daughter->energy());
-            fatjet_daughter_pt.back().push_back(Daughter->pt());
-            fatjet_daughter_eta.back().push_back(Daughter->eta());
-            fatjet_daughter_phi.back().push_back(Daughter->phi());
-            fatjet_daughter_ch.back().push_back(Daughter->charge());
-            fatjet_daughter_mass.back().push_back(Daughter->mass());
+            if(Daughter->pdgId()==0){
+               for(size_t gd=0; gd<Daughter->numberOfDaughters(); gd++){
+                  const reco::Candidate * GrandDaughter = Daughter->daughter(gd);
+                  fatjet_daughter_e.back().push_back(GrandDaughter->energy());
+                  fatjet_daughter_pt.back().push_back(GrandDaughter->pt());
+                  fatjet_daughter_eta.back().push_back(GrandDaughter->eta());
+                  fatjet_daughter_phi.back().push_back(GrandDaughter->phi());
+                  fatjet_daughter_ch.back().push_back(GrandDaughter->charge());
+                  fatjet_daughter_mass.back().push_back(GrandDaughter->mass());
+                  fatjet_daughter_pdgid.back().push_back(GrandDaughter->pdgId());
+               }
+            }else{
+               fatjet_daughter_e.back().push_back(Daughter->energy());
+               fatjet_daughter_pt.back().push_back(Daughter->pt());
+               fatjet_daughter_eta.back().push_back(Daughter->eta());
+               fatjet_daughter_phi.back().push_back(Daughter->phi());
+               fatjet_daughter_ch.back().push_back(Daughter->charge());
+               fatjet_daughter_mass.back().push_back(Daughter->mass());
+               fatjet_daughter_pdgid.back().push_back(Daughter->pdgId());
+            }
          }
       } 
    }

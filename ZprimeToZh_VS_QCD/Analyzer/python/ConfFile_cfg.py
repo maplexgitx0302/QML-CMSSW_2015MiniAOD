@@ -1,14 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
-"""Configuration Parameters"""
-MAX_EVENTS = 5000
-# MAIN_PROCESS = "ZprimeToZhToZinvhbb"
-# MAIN_PROCESS = "ZprimeToZhToZlephbb"
-# MAIN_PROCESS = "QCD_HT1500to2000"
-MAIN_PROCESS = "QCD_HT2000toInf"
-"""------------------------"""
+main_path = "/code/CMSSW_7_6_7/src/ZprimeToZh_VS_QCD/Analyzer/root_files/"
 
-f = open("/code/CMSSW_7_6_7/src/ZprimeToZh_VS_QCD/Analyzer/python/Rootfiles_download/"+MAIN_PROCESS+".txt", "r")
+f = open(main_path+"config.txt", "r")
+channel, num_events = f.read().split()
+num_events = int(num_events)
+f.close()
+
+f = open(main_path+channel+".txt", "r")
 rootfile_url = f.read().splitlines()
 f.close()
 
@@ -16,7 +15,7 @@ process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(MAX_EVENTS) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(num_events) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -41,6 +40,7 @@ process.jets = cms.EDAnalyzer('Analyzer',
 				)
 
 #----- RUN THE JOB! -----#
-process.TFileService = cms.Service("TFileService", fileName=cms.string(MAIN_PROCESS+".root"))
+root_file_name = main_path + channel + "_" + str(num_events) + ".root"
+process.TFileService = cms.Service("TFileService", fileName=cms.string(root_file_name))
 
 process.p = cms.Path(process.jets)
