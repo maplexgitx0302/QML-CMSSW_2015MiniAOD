@@ -9,9 +9,9 @@ class JetEvents:
                         default use "pt" -> high quality in barrel
 
         '''
-        self.events = events
+        self.events = events.arrays()
         self.jet_type, self.keep_by = jet_type, keep_by
-        self.num_events = len(events[f"{jet_type}_{keep_by}"].array())
+        self.num_events = len(events[f"{jet_type}_{keep_by}"])
         self.nsubjettiness = {}
         self.daughter = {} # can be viewed as a tree
         self.keep_index = None # index of which jet to keep for each event
@@ -20,7 +20,7 @@ class JetEvents:
 
     def _extract_daughter(self):
         # get criterion array and get max key value index
-        criterion_array = self.events[f"{self.jet_type}_{self.keep_by}"].array()
+        criterion_array = self.events[f"{self.jet_type}_{self.keep_by}"]
         keep_index = ak.firsts(ak.argsort(criterion_array, ascending=False))
         keep_index = ak.unflatten(keep_index, counts=np.ones(len(criterion_array), dtype=int))
         self.keep_index = keep_index
@@ -28,12 +28,12 @@ class JetEvents:
         features = ["e", "pt", "eta", "phi", "ch", "mass", "pdgid", "tau1", "tau2", "tau3"]
         for feature in features:
             if feature in ["e", "pt", "eta", "phi", "ch", "mass", "pdgid"]:
-                feature_array = self.events[f"{self.jet_type}_daughter_{feature}"].array()
+                feature_array = self.events[f"{self.jet_type}_daughter_{feature}"]
                 feature_array = feature_array[keep_index]
                 feature_array = ak.flatten(feature_array, axis=1)
                 self.daughter[feature] = feature_array
             elif self.jet_type == "fatjet" and feature in ["tau1", "tau2", "tau3"]:
-                feature_array = self.events[f"{self.jet_type}_{feature}"].array()
+                feature_array = self.events[f"{self.jet_type}_{feature}"]
                 feature_array = feature_array[keep_index]
                 feature_array = ak.flatten(feature_array, axis=1)
                 self.nsubjettiness[feature] = feature_array
