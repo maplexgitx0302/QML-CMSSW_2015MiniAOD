@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-main_path = "/code/CMSSW_7_6_7/src/ZprimeToZh_VS_QCD/Analyzer/root_files/"
+main_path = "/code/CMSSW_7_6_7/src/QCD_Jet_Fatjet/Analyzer/root_files/"
 
 f = open(main_path+"config.txt", "r")
 channel, num_events = f.read().split()

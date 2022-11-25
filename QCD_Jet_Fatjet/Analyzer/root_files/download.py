@@ -11,7 +11,7 @@ channels = [
 
 for channel in channels:
     main_path = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.dirname(main_path) + "/python/ConfFile_cfg.py"
+    config_path = os.path.dirname(main_path) + "/python/Remote_ConfFile_cfg.py"
 
     f = open(main_path+"/config.txt", "w")
     f.writelines([channel, " ", str(num_events)])
