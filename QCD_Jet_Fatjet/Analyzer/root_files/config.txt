@@ -1,1 +1,1 @@
-ZprimeToZhToZlephbb 1000
+ZprimeToZhToZinvhbb 50000

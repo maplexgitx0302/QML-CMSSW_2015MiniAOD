@@ -1,12 +1,12 @@
 import os
 import subprocess
 
-num_events = 1000
+num_events = 100
 channels = [
     "ZprimeToZhToZinvhbb",
-    "ZprimeToZhToZlephbb",
-    "QCD_HT1500to2000",
-    "QCD_HT2000toInf",
+    # "ZprimeToZhToZlephbb",
+    # "QCD_HT1500to2000",
+    # "QCD_HT2000toInf",
 ]
 
 for channel in channels:
