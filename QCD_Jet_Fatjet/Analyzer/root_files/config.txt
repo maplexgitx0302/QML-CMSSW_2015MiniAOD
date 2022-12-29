@@ -1,1 +1,1 @@
-ZprimeToZhToZinvhbb 50000
+QCD_HT2000toInf 50000
