@@ -19,7 +19,7 @@ def load_data_buffer(channel, get_method, *args):
 def get_parent_info(channel, num_events, jet_type, cut=None):
     expressions = [f"{jet_type}_{feature}" for feature in ["pt", "eta", "phi"]]
     if jet_type == "fatjet":
-        expressions += ["fatjet_tau1", "fatjet_tau2", "fatjet_tau3"]
+        expressions += ["fatjet_tau1", "fatjet_tau2", "fatjet_tau3", "fatjet_tau2/fatjet_tau1", "fatjet_tau3/fatjet_tau2"]
     events = get_events(channel, num_events, jet_type, cut, expressions)
     trimmed_events = torch.cat((
         torch.tensor(events[f"{jet_type}_pt"])[:, None], 
@@ -30,7 +30,9 @@ def get_parent_info(channel, num_events, jet_type, cut=None):
             trimmed_events,
             torch.tensor(events["fatjet_tau1"])[:, None],
             torch.tensor(events["fatjet_tau2"])[:, None],
-            torch.tensor(events["fatjet_tau3"])[:, None]), dim=1)
+            torch.tensor(events["fatjet_tau3"])[:, None],
+            torch.tensor(events["fatjet_tau2/fatjet_tau1"])[:, None],
+            torch.tensor(events["fatjet_tau3/fatjet_tau2"])[:, None]), dim=1)
     return trimmed_events
 
 def get_daughter_info(channel, num_events, num_particles, jet_type, cut=None):

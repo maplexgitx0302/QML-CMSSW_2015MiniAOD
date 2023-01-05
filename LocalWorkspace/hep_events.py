@@ -21,7 +21,7 @@ def get_events(channel, num_events, jet_type, cut=None, expressions=None):
     '''
 
     # read channel root file
-    src_path  = "/Users/yianchen/CMS_Open_Data_Workspace/CMSSW_7_6_7/src"
+    src_path  = "/home/yianchen/CMS_Open_Data_Workspace/CMSSW_7_6_7/src"
     dir_path  = f"{src_path}/QCD_Jet_Fatjet/Analyzer/root_files"
     root_path = f"{dir_path}/{channel}_{num_events}.root"
     events = uproot.open(root_path + ":jets")

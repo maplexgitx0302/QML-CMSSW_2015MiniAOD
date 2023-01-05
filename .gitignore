@@ -2,3 +2,4 @@
 *__pycache__
 *.root
 *lightning_logs
+*wandb*
