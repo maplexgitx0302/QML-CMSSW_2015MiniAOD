@@ -5,7 +5,9 @@
 
 # %%
 # system
-import os, time, datetime
+import os
+import time, datetime
+from tqdm import tqdm
 
 # hep and toy model
 import toy
@@ -40,17 +42,22 @@ wandb.login()
 
 # %%
 project_name = "wandb_arckernel"
-jet_type = "fatjet"
+jet_type = "jet"
 
 # whether use toy data and quantum model
-enable_logger = True
 train_toy = False
-train_quantum = False
+train_quantum = True
+enable_logger = True
+fast_dev_run = False
+if train_toy:
+    project_name = "wandb_toy"
+elif train_quantum:
+    project_name = "wandb_arckernel_hybrid"
 
 # hep data hyper-parameters
 data_config = {
     "num_events":50000,
-    "num_particles":0,
+    "num_particles":3,
     "cut":f"({jet_type}_pt >= 500) & ({jet_type}_pt <= 1500)",
     "signal_channel":"ZprimeToZhToZinvhbb",
     "background_channel":"QCD_HT2000toInf",
@@ -60,13 +67,13 @@ data_config = {
 hyper_config = {
     # general settings
     "random_seed":0,
-    "max_num_data":2000,
+    "max_num_data":10000,
     "train_ratio":0.8,
     "valid_ratio":0.2,
 
     # constants
     "lr":1E-3,
-    "batch_size":16,
+    "batch_size":128,
     "num_workers":12,
 
     # functions
@@ -81,11 +88,11 @@ hyper_config = {
 # pytorch_lightning trainer
 trainer_config = {
     "accelerator":"gpu",
-    "max_epochs":100,
-    "fast_dev_run":False,
+    "max_epochs":50,
+    "fast_dev_run":fast_dev_run,
     "deterministic":True,
     "log_every_n_steps":1,
-    "auto_scale_batch_size":"power",
+    "auto_scale_batch_size":None,
 }
 
 # for trainer callbacks config (need to reinitiate callback for each run)
@@ -94,12 +101,7 @@ callback_config = {
 }
 
 if train_toy:
-    project_name = "wandb_toy"
-    trainer_config["max_epochs"] = 100
-    trainer_config["log_every_n_steps"] = 1
-    hyper_config["lr"] = 1E-1
-    hyper_config["log_freq"] = 1
-    ansatz_config = toy.ansatz_config
+    hyper_config, trainer_config, ansatz_config = toy.set_config(hyper_config, trainer_config)
 else:
     if jet_type == "jet":
         input_dim = 3 + 3*data_config["num_particles"] # pt eta phi
@@ -108,15 +110,14 @@ else:
     # ansatz
     ansatz_config = [
         # input_dim, hidden_dim, hidden_layers, num_layers, num_reupload
-        (input_dim, 20*input_dim, 0, 0, 0),
-        (input_dim, 50*input_dim, 0, 0, 0),
-        (input_dim, 80*input_dim, 0, 0, 0),
-        (input_dim, 20*input_dim, 1, 0, 0),
-        (input_dim, 50*input_dim, 1, 0, 0),
-        (input_dim, 80*input_dim, 1, 0, 0),
-        (input_dim, 20*input_dim, 2, 0, 0),
-        (input_dim, 50*input_dim, 2, 0, 0),
-        (input_dim, 80*input_dim, 2, 0, 0),
+        (input_dim, 1*input_dim, 3, 1, 1),
+        (input_dim, 1*input_dim, 4, 1, 1),
+        (input_dim, 1*input_dim, 5, 1, 1),
+        (input_dim, 1*input_dim, 6, 1, 1),
+        (input_dim, 5*input_dim, 3, 1, 1),
+        (input_dim, 5*input_dim, 4, 1, 1),
+        (input_dim, 5*input_dim, 5, 1, 1),
+        (input_dim, 5*input_dim, 6, 1, 1),
     ]
 
 # %%
@@ -151,25 +152,18 @@ class JetDataset(Dataset):
         daughter_pt_eta_phi = events[:, -3*data_config["num_particles"]:].reshape(-1, 3, data_config["num_particles"])
         parent_pt, parent_eta, parent_phi = parent_pt_eta_phi.transpose(0, 1)
         daughter_pt, daughter_eta, daughter_phi = daughter_pt_eta_phi.transpose(0, 1)
-        pt_ratio, delta_eta, delta_phi = daughter_pt/parent_pt, daughter_eta-parent_eta, daughter_phi-parent_phi
+        pt_ratio, delta_eta, delta_phi = daughter_pt/torch.sum(daughter_pt**2), daughter_eta-parent_eta, daughter_phi-parent_phi
         delta_r, cluster_radius = torch.sqrt(delta_eta**2 + delta_phi**2), 1
-        norm_pt  = (1/daughter_pt) * delta_r / cluster_radius
-        norm_eta = delta_eta / delta_r
-        norm_phi = delta_phi / delta_r
+        norm_pt  = (pt_ratio) * (delta_r / cluster_radius)
+        norm_eta = (delta_eta / delta_r)
+        norm_phi = (delta_phi / delta_r)
         if not ((torch.abs(norm_pt) <= 1).all() and (torch.abs(norm_eta) <= 1).all() and  (torch.abs(norm_phi) <= 1).all()):
             num_norm_pt  = torch.sum(torch.abs(norm_pt) > 1)
             num_norm_eta = torch.sum(torch.abs(norm_eta) > 1)
             num_norm_phi = torch.sum(torch.abs(norm_phi) > 1)
-            print(f"Recieve value greater than 1 in torch.asin() : (num_pt={num_norm_pt}, num_eta={num_norm_eta}, num_phi={num_norm_phi})")
-            if num_norm_pt > 0:
-                norm_pt[norm_pt > 1] = 1
-                norm_pt[norm_pt < -1] = -1
-            if num_norm_eta > 0:
-                norm_eta[norm_eta > 1] = 1
-                norm_eta[norm_eta < -1] = -1
-            if num_norm_phi > 0:
-                norm_phi[norm_phi > 1] = 1
-                norm_phi[norm_phi < -1] = -1
+            raise(ValueError(f"Recieve value greater than pi in torch.asin() : (num_pt={num_norm_pt}, num_eta={num_norm_eta}, num_phi={num_norm_phi})"))
+        else:
+            print(f"Log(get_norm):Arguments (norms) of arcsin are within [-1, 1]")
         events = torch.cat((events, norm_pt, norm_eta, norm_phi), dim=-1)
         return events
 
@@ -364,61 +358,63 @@ class LitModel(pl.LightningModule):
 """
 
 # %%
-# data modules
-if train_toy == True:
-    c_datamodule  = toy.ToyDataModule(batch_size=hyper_config["batch_size"], num_workers=hyper_config["num_workers"])
-    q_datamodule  = toy.ToyDataModule(batch_size=hyper_config["batch_size"], num_workers=hyper_config["num_workers"])
-else:
-    c_datamodule  = JetDataModule(norm=False)
-    q_datamodule  = JetDataModule(norm=True)
-
-def train(input_dim, hidden_dim, hidden_layers, num_layers, num_reupload, enable_logger=True):
+def train(model, datamodule, logger_name):
     pl.seed_everything(hyper_config["random_seed"], workers=True)
-    current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-    wandb_name = f"{current_time}_{input_dim}_{hidden_dim}_{hidden_layers}_{num_layers}_{num_reupload}"
-    
-    # setup logger (wandb)
+
+    # pl logger setup
     logger = None
     if enable_logger:
-        logger = WandbLogger(project=project_name, name=wandb_name)
+        logger = WandbLogger(project=project_name, name=logger_name)
         wandb_config = {}
         wandb_config.update(data_config)
         wandb_config.update(hyper_config)
         wandb_config.update(trainer_config)
         logger.experiment.config.update(wandb_config)
+        logger.watch(model, log="all", log_freq=hyper_config["log_freq"])
     
-    # setup callbacks
+    # pl callbacks setup
     callbacks = []
     for key, value in callback_config.items():
         callbacks.append(key(**value))
 
-    # classical model
-    c_nn = ClassicalFNNModel(input_dim, hidden_dim, hidden_layers)
-    c_model = LitModel(c_nn)
-    logger.watch(c_model, log="all", log_freq=hyper_config["log_freq"])
-    c_trainer = pl.Trainer(**trainer_config, logger=logger, callbacks=callbacks)
-    c_trainer.tune(c_model, c_datamodule)
-    c_trainer.fit(model=c_model, datamodule=c_datamodule)
-    c_trainer.test(model=c_model, datamodule=c_datamodule)
-
-    # quantum model
-    if not train_toy and train_quantum:
-        q_c_nn = ClassicalFNNModel(input_dim + 3*data_config["num_particles"], hidden_dim, hidden_layers)
-        q_nn = HybridArcKernelDaughterModel(q_c_nn, data_config["num_particles"], num_layers, num_reupload)
-        q_model = LitModel(q_nn)
-        logger.watch(q_model, log="all", log_freq=hyper_config["log_freq"])
-        q_trainer = pl.Trainer(**trainer_config, logger=logger)
-        q_trainer.tune(q_model, q_datamodule)
-        q_trainer.fit(model=q_model, datamodule=q_datamodule)
-        q_trainer.test(model=q_model, datamodule=q_datamodule)
-
+    # trainer setup
+    trainer = pl.Trainer(**trainer_config, logger=logger, callbacks=callbacks)
+    if trainer_config["auto_scale_batch_size"] != None:
+        trainer.tune(model, datamodule)
+    
+    # start fitting and testing
+    trainer.fit(model=model, datamodule=datamodule)
+    trainer.test(model=model, datamodule=datamodule)
     if enable_logger:
         wandb.finish()
 
+# %%
+# data modules
+pl.seed_everything(hyper_config["random_seed"], workers=True)
 if train_toy:
-    for ansatz in ansatz_config:
-        train(*ansatz, num_layers=0, num_reupload=0, enable_logger=enable_logger)
+    c_datamodule = toy.ToyDataModule(batch_size=hyper_config["batch_size"], num_workers=hyper_config["num_workers"])
+    q_datamodule = toy.ToyDataModule(batch_size=hyper_config["batch_size"], num_workers=hyper_config["num_workers"])
 else:
-    for ansatz in ansatz_config:
-        if not train_quantum:
-            train(*ansatz, enable_logger=enable_logger)
+    c_datamodule = JetDataModule(norm=False)
+    q_datamodule = JetDataModule(norm=True)
+
+if train_toy:
+    for ansatz in tqdm(ansatz_config, "Toy Model"):
+        current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+        logger_name = f"toy_({','.join(list(map(str, ansatz)))})_{current_time}"
+        model = LitModel(ClassicalFNNModel(*ansatz))
+        train(model, c_datamodule, logger_name)
+else:
+    for ansatz in tqdm(ansatz_config, "HEP Model"):
+        current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+        c_logger_name = f"{jet_type}_ptc{data_config['num_particles']}_classical_({','.join(list(map(str, ansatz)))})_{current_time}"
+        c_model = LitModel(ClassicalFNNModel(*ansatz[:3]))
+        train(c_model, c_datamodule, c_logger_name)
+        if train_quantum:
+            current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+            q_logger_name = f"{jet_type}_ptc{data_config['num_particles']}quantum_({','.join(list(map(str, ansatz)))})_{current_time}"
+            q_ansatz = list(ansatz)
+            q_ansatz[0] += 3 * data_config["num_particles"]
+            c_model = ClassicalFNNModel(*q_ansatz[:3])
+            q_model = LitModel(HybridArcKernelDaughterModel(c_model, data_config['num_particles'], *q_ansatz[3:]))
+            train(q_model, q_datamodule, q_logger_name)
