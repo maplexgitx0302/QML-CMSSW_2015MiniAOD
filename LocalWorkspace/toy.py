@@ -3,9 +3,9 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 
 def set_config(hyper_config, trainer_config):
-    trainer_config["max_epochs"] = 20
+    trainer_config["max_epochs"] = 1000
     trainer_config["log_every_n_steps"] = 1
-    hyper_config["lr"] = 1E-1
+    hyper_config["lr"] = 1
     hyper_config["log_freq"] = 1
     ansatz_config = [
         (4, 10, 0), 

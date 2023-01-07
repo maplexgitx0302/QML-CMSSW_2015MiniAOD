@@ -5,7 +5,7 @@
 
 # %%
 # system
-import os
+import os, glob
 import time, datetime
 from tqdm import tqdm
 
@@ -51,14 +51,12 @@ enable_logger = True
 fast_dev_run = False
 if train_toy:
     project_name = "wandb_toy"
-elif train_quantum:
-    project_name = "wandb_arckernel_hybrid"
 
 # hep data hyper-parameters
 data_config = {
     "num_events":50000,
     "num_particles":3,
-    "cut":f"({jet_type}_pt >= 500) & ({jet_type}_pt <= 1500)",
+    "cut":f"({jet_type}_pt>=500)&({jet_type}_pt<=1500)",
     "signal_channel":"ZprimeToZhToZinvhbb",
     "background_channel":"QCD_HT2000toInf",
 }
@@ -67,7 +65,7 @@ data_config = {
 hyper_config = {
     # general settings
     "random_seed":0,
-    "max_num_data":10000,
+    "max_num_data":2000,
     "train_ratio":0.8,
     "valid_ratio":0.2,
 
@@ -88,7 +86,7 @@ hyper_config = {
 # pytorch_lightning trainer
 trainer_config = {
     "accelerator":"gpu",
-    "max_epochs":50,
+    "max_epochs":60,
     "fast_dev_run":fast_dev_run,
     "deterministic":True,
     "log_every_n_steps":1,
@@ -110,14 +108,23 @@ else:
     # ansatz
     ansatz_config = [
         # input_dim, hidden_dim, hidden_layers, num_layers, num_reupload
+        (input_dim, 10*input_dim, 3, 0, 0),
+        (input_dim, 10*input_dim, 4, 0, 0),
+        (input_dim, 10*input_dim, 5, 0, 0),
+        (input_dim, 10*input_dim, 6, 0, 0),
+        (input_dim, 50*input_dim, 3, 0, 0),
+        (input_dim, 50*input_dim, 4, 0, 0),
+        (input_dim, 50*input_dim, 5, 0, 0),
+        (input_dim, 50*input_dim, 6, 0, 0),
+
         (input_dim, 1*input_dim, 3, 1, 1),
         (input_dim, 1*input_dim, 4, 1, 1),
-        (input_dim, 1*input_dim, 5, 1, 1),
-        (input_dim, 1*input_dim, 6, 1, 1),
         (input_dim, 5*input_dim, 3, 1, 1),
         (input_dim, 5*input_dim, 4, 1, 1),
-        (input_dim, 5*input_dim, 5, 1, 1),
-        (input_dim, 5*input_dim, 6, 1, 1),
+        (input_dim, 1*input_dim, 3, 1, 2),
+        (input_dim, 1*input_dim, 4, 1, 2),
+        (input_dim, 5*input_dim, 3, 1, 2),
+        (input_dim, 5*input_dim, 4, 1, 2),
     ]
 
 # %%
@@ -364,12 +371,12 @@ def train(model, datamodule, logger_name):
     # pl logger setup
     logger = None
     if enable_logger:
-        logger = WandbLogger(project=project_name, name=logger_name)
+        logger = WandbLogger(project=project_name, name=f"{logger_name}", id=logger_name)
         wandb_config = {}
         wandb_config.update(data_config)
         wandb_config.update(hyper_config)
         wandb_config.update(trainer_config)
-        logger.experiment.config.update(wandb_config)
+        logger.experiment.config.update(wandb_config, allow_val_change=True)
         logger.watch(model, log="all", log_freq=hyper_config["log_freq"])
     
     # pl callbacks setup
@@ -383,7 +390,13 @@ def train(model, datamodule, logger_name):
         trainer.tune(model, datamodule)
     
     # start fitting and testing
-    trainer.fit(model=model, datamodule=datamodule)
+    checkpoints_dir = f"./{project_name}/{logger_name}/checkpoints/"
+    try:
+        ckpt_path = glob.glob(f'{checkpoints_dir}/*ckpt')[0]
+    except:
+        ckpt_path = None
+        print(f"Log(checkpoints): *.ckpt files not found, start training from initial state.")
+    trainer.fit(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
     trainer.test(model=model, datamodule=datamodule)
     if enable_logger:
         wandb.finish()
@@ -400,19 +413,17 @@ else:
 
 if train_toy:
     for ansatz in tqdm(ansatz_config, "Toy Model"):
-        current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-        logger_name = f"toy_({','.join(list(map(str, ansatz)))})_{current_time}"
+        logger_name = f"toy_({','.join(list(map(str, ansatz)))})"
         model = LitModel(ClassicalFNNModel(*ansatz))
         train(model, c_datamodule, logger_name)
 else:
     for ansatz in tqdm(ansatz_config, "HEP Model"):
-        current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-        c_logger_name = f"{jet_type}_ptc{data_config['num_particles']}_classical_({','.join(list(map(str, ansatz)))})_{current_time}"
+        logger_prefix = f"{jet_type}_ptc{data_config['num_particles']}_n{hyper_config['max_num_data']}_{data_config['cut']}"
+        c_logger_name = f"{logger_prefix}_classical_({','.join(list(map(str, ansatz)))})"
         c_model = LitModel(ClassicalFNNModel(*ansatz[:3]))
         train(c_model, c_datamodule, c_logger_name)
-        if train_quantum:
-            current_time = datetime.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-            q_logger_name = f"{jet_type}_ptc{data_config['num_particles']}quantum_({','.join(list(map(str, ansatz)))})_{current_time}"
+        if train_quantum and (ansatz[3] != 0 or ansatz[4] != 0):
+            q_logger_name = f"{logger_prefix}_quantum_({','.join(list(map(str, ansatz)))})"
             q_ansatz = list(ansatz)
             q_ansatz[0] += 3 * data_config["num_particles"]
             c_model = ClassicalFNNModel(*q_ansatz[:3])
