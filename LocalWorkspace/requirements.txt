@@ -1,0 +1,14 @@
+awkward==2.0.5
+matplotlib==3.6.2
+numpy==1.23.5
+pandas==1.5.2
+PennyLane==0.28.0
+pytorch_lightning==1.8.6
+qympy==1.4.0
+scikit_learn==1.2.0
+seaborn==0.12.2
+sympy==1.11.1
+torch==1.12.1+cu113
+torchmetrics==0.11.0
+tqdm==4.64.1
+uproot==5.0.2

@@ -3,7 +3,7 @@ import pytorch_lightning as pl
 from torch.utils.data import Dataset, DataLoader
 
 def set_config(hyper_config, trainer_config):
-    trainer_config["max_epochs"] = 1000
+    trainer_config["max_epochs"] = 5
     trainer_config["log_every_n_steps"] = 1
     hyper_config["lr"] = 1
     hyper_config["log_freq"] = 1
