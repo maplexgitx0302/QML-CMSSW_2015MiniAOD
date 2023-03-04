@@ -8,6 +8,16 @@ import awkward as ak
 from tqdm import tqdm
 from hep_events import get_events
 
+pdgid_table = {
+    "electron": 11,
+    "muon": 13,
+    "gamma": 22,
+    "ch_hadron": 211,
+    "neu_hadron": 130,
+    "HF_hadron": 1,
+    "HF_em": 2,
+}
+
 def load_data_buffer(channel:str, get_method:typing.Callable, *args) -> torch.Tensor:
     ''' Load data with hep_events.get_events()
     - channel: channel(process) name
@@ -80,3 +90,37 @@ def get_daughter_info(channel:str, num_events:int, num_particles:int, jet_type:s
         phi[:l] = torch.tensor(events[f"{jet_type}_daughter_phi"][i][idx_argsort[i][:l]])
         trimmed_events[i] = torch.cat((pt, eta, phi), dim=0)
     return trimmed_events
+
+def get_pdgid_info(channel:str, num_events:int, num_particles:int, jet_type:str, cut=None):
+    ''' Get pdgid information of a given channel, grouped daughter by pdgid and charge
+    - num_particles: how many daughter to be selected (highest pt) in each events
+    - pt eta phi of the daughter of a jet/fatjet
+    '''
+
+    # feature to be extracted (only daughter)
+    expressions = [f"{jet_type}_daughter_{feature}" for feature in ["ch", "pdgid", "pt", "eta", "phi"]]
+    events = get_events(channel, num_events, jet_type, cut, expressions)
+
+    # choose positive hadron, gamma, negative hadron
+    target_pdgid = [pdgid_table["gamma"], pdgid_table["ch_hadron"], pdgid_table["neu_hadron"], -pdgid_table["ch_hadron"]]
+    total_trimmed_events = []
+    for pdgid in target_pdgid:
+        # select the particle with target pdgid
+        selected_idx = (events[f"{jet_type}_daughter_pdgid"] == pdgid)
+        selected_pt  = events[f"{jet_type}_daughter_pt"][selected_idx]
+        selected_eta = events[f"{jet_type}_daughter_eta"][selected_idx]
+        selected_phi = events[f"{jet_type}_daughter_phi"][selected_idx]
+        idx_argsort  = ak.argsort(selected_pt, axis=-1, ascending=False)
+        # only choose daughters with highest pt
+        trimmed_events = torch.zeros((len(events), num_particles*3))
+        idx_argsort = ak.argsort(selected_pt, axis=-1, ascending=False)
+        for i in tqdm(range(len(events)), desc=f"get_pdgid_info : Channel {channel} with {num_events} events"):
+            # some events would not have as much particles as num_particles
+            l = min(len(idx_argsort[i]), num_particles)
+            pt, eta, phi = torch.zeros(num_particles), torch.zeros(num_particles), torch.zeros(num_particles)
+            pt[:l]  = torch.tensor(selected_pt[i][idx_argsort[i][:l]])
+            eta[:l] = torch.tensor(selected_eta[i][idx_argsort[i][:l]])
+            phi[:l] = torch.tensor(selected_phi[i][idx_argsort[i][:l]])
+            trimmed_events[i] = torch.cat((pt, eta, phi), dim=0)
+        total_trimmed_events.append(trimmed_events)
+    return torch.cat(total_trimmed_events, dim=1)
