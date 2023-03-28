@@ -75,12 +75,18 @@ class Analyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       int numfatjet; //number of jets in the event
       TTree *mtree;
       std::vector<float> jet_e;
+      std::vector<float> jet_px;
+      std::vector<float> jet_py;
+      std::vector<float> jet_pz;
       std::vector<float> jet_pt;
       std::vector<float> jet_eta;
       std::vector<float> jet_phi;
       std::vector<float> jet_ch;
       std::vector<float> jet_mass;
       std::vector<std::vector<float>> jet_daughter_e;
+      std::vector<std::vector<float>> jet_daughter_px;
+      std::vector<std::vector<float>> jet_daughter_py;
+      std::vector<std::vector<float>> jet_daughter_pz;
       std::vector<std::vector<float>> jet_daughter_pt;
       std::vector<std::vector<float>> jet_daughter_eta;
       std::vector<std::vector<float>> jet_daughter_phi;
@@ -89,12 +95,18 @@ class Analyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       std::vector<std::vector<int>> jet_daughter_pdgid;
 
       std::vector<float> fatjet_e;
+      std::vector<float> fatjet_px;
+      std::vector<float> fatjet_py;
+      std::vector<float> fatjet_pz;
       std::vector<float> fatjet_pt;
       std::vector<float> fatjet_eta;
       std::vector<float> fatjet_phi;
       std::vector<float> fatjet_ch;
       std::vector<float> fatjet_mass;
       std::vector<std::vector<float>> fatjet_daughter_e;
+      std::vector<std::vector<float>> fatjet_daughter_px;
+      std::vector<std::vector<float>> fatjet_daughter_py;
+      std::vector<std::vector<float>> fatjet_daughter_pz;
       std::vector<std::vector<float>> fatjet_daughter_pt;
       std::vector<std::vector<float>> fatjet_daughter_eta;
       std::vector<std::vector<float>> fatjet_daughter_phi;
@@ -129,6 +141,12 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("numberjet")->SetTitle("Number of Jets");
    mtree->Branch("jet_e",&jet_e);
    mtree->GetBranch("jet_e")->SetTitle("Uncorrected Jet energy");
+   mtree->Branch("jet_px",&jet_px);
+   mtree->GetBranch("jet_px")->SetTitle("Uncorrected Jet Momentum x");
+   mtree->Branch("jet_py",&jet_py);
+   mtree->GetBranch("jet_py")->SetTitle("Uncorrected Jet Momentum y");
+   mtree->Branch("jet_pz",&jet_pz);
+   mtree->GetBranch("jet_pz")->SetTitle("Uncorrected Jet Momentum z");
    mtree->Branch("jet_pt",&jet_pt);
    mtree->GetBranch("jet_pt")->SetTitle("Uncorrected Transverse Jet Momentum");
    mtree->Branch("jet_eta",&jet_eta);
@@ -139,8 +157,16 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("jet_ch")->SetTitle("Jet Charge");
    mtree->Branch("jet_mass",&jet_mass);
    mtree->GetBranch("jet_mass")->SetTitle("Jet Mass");
+   mtree->Branch("jet_px",&jet_px);
+   mtree->GetBranch("jet_px")->SetTitle("Jet px");
    mtree->Branch("jet_daughter_e",&jet_daughter_e);
    mtree->GetBranch("jet_daughter_e")->SetTitle("Uncorrected Jet Daughter energy");
+   mtree->Branch("jet_daughter_px",&jet_daughter_px);
+   mtree->GetBranch("jet_daughter_px")->SetTitle("Uncorrected Jet Daughter Momentum x");
+   mtree->Branch("jet_daughter_py",&jet_daughter_py);
+   mtree->GetBranch("jet_daughter_py")->SetTitle("Uncorrected Jet Daughter Momentum y");
+   mtree->Branch("jet_daughter_pz",&jet_daughter_pz);
+   mtree->GetBranch("jet_daughter_pz")->SetTitle("Uncorrected Jet Daughter Momentum z");
    mtree->Branch("jet_daughter_pt",&jet_daughter_pt);
    mtree->GetBranch("jet_daughter_pt")->SetTitle("Uncorrected Transverse Jet Daughter Momentum");
    mtree->Branch("jet_daughter_eta",&jet_daughter_eta);
@@ -158,6 +184,12 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("numberfatjet")->SetTitle("Number of Fatjets");
    mtree->Branch("fatjet_e",&fatjet_e);
    mtree->GetBranch("fatjet_e")->SetTitle("Uncorrected Fatjet energy");
+   mtree->Branch("fatjet_px",&fatjet_px);
+   mtree->GetBranch("fatjet_px")->SetTitle("Uncorrected Fatjet Momentum x");
+   mtree->Branch("fatjet_py",&fatjet_py);
+   mtree->GetBranch("fatjet_py")->SetTitle("Uncorrected Fatjet Momentum y");
+   mtree->Branch("fatjet_pz",&fatjet_pz);
+   mtree->GetBranch("fatjet_pz")->SetTitle("Uncorrected Fatjet Momentum z");
    mtree->Branch("fatjet_pt",&fatjet_pt);
    mtree->GetBranch("fatjet_pt")->SetTitle("Uncorrected Transverse Fatjet Momentum");
    mtree->Branch("fatjet_eta",&fatjet_eta);
@@ -170,6 +202,12 @@ Analyzer::Analyzer(const edm::ParameterSet& iConfig):
    mtree->GetBranch("fatjet_mass")->SetTitle("Fatjet Mass");
    mtree->Branch("fatjet_daughter_e",&fatjet_daughter_e);
    mtree->GetBranch("fatjet_daughter_e")->SetTitle("Uncorrected Fatjet Daughter energy");
+   mtree->Branch("fatjet_daughter_px",&fatjet_daughter_px);
+   mtree->GetBranch("fatjet_daughter_px")->SetTitle("Uncorrected Fatjet Daughter Momentum x");
+   mtree->Branch("fatjet_daughter_py",&fatjet_daughter_py);
+   mtree->GetBranch("fatjet_daughter_py")->SetTitle("Uncorrected Fatjet Daughter Momentum y");
+   mtree->Branch("fatjet_daughter_pz",&fatjet_daughter_pz);
+   mtree->GetBranch("fatjet_daughter_pz")->SetTitle("Uncorrected Fatjet Daughter Momentum z");
    mtree->Branch("fatjet_daughter_pt",&fatjet_daughter_pt);
    mtree->GetBranch("fatjet_daughter_pt")->SetTitle("Uncorrected Transverse Fatjet Daughter Momentum");
    mtree->Branch("fatjet_daughter_eta",&fatjet_daughter_eta);
@@ -218,12 +256,19 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    numjet = 0;
    jet_e.clear();
+   jet_px.clear();
+   jet_py.clear();
+   jet_pz.clear();
    jet_pt.clear();
    jet_eta.clear();
    jet_phi.clear();
    jet_ch.clear();
    jet_mass.clear();
+   jet_px.clear();
    jet_daughter_e.clear();
+   jet_daughter_px.clear();
+   jet_daughter_py.clear();
+   jet_daughter_pz.clear();
    jet_daughter_pt.clear();
    jet_daughter_eta.clear();
    jet_daughter_phi.clear();
@@ -233,12 +278,18 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    numfatjet = 0;
    fatjet_e.clear();
+   fatjet_px.clear();
+   fatjet_py.clear();
+   fatjet_pz.clear();
    fatjet_pt.clear();
    fatjet_eta.clear();
    fatjet_phi.clear();
    fatjet_ch.clear();
    fatjet_mass.clear();
    fatjet_daughter_e.clear();
+   fatjet_daughter_px.clear();
+   fatjet_daughter_py.clear();
+   fatjet_daughter_pz.clear();
    fatjet_daughter_pt.clear();
    fatjet_daughter_eta.clear();
    fatjet_daughter_phi.clear();
@@ -253,12 +304,19 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       for (const pat::Jet &jet : *jets){
          pat::Jet uncorrJet = jet.correctedJet(0);
          jet_e.push_back(uncorrJet.energy());
+         jet_px.push_back(uncorrJet.px());
+         jet_py.push_back(uncorrJet.py());
+         jet_pz.push_back(uncorrJet.pz());
          jet_pt.push_back(uncorrJet.pt());
          jet_eta.push_back(uncorrJet.eta());
          jet_phi.push_back(uncorrJet.phi());
          jet_ch.push_back(uncorrJet.charge());
          jet_mass.push_back(uncorrJet.mass());
+         jet_px.push_back(uncorrJet.px());
          jet_daughter_e.push_back({});
+         jet_daughter_px.push_back({});
+         jet_daughter_py.push_back({});
+         jet_daughter_pz.push_back({});
          jet_daughter_pt.push_back({});
          jet_daughter_eta.push_back({});
          jet_daughter_phi.push_back({});
@@ -270,6 +328,9 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          for(size_t d=0; d<num_daughter; d++){
             const reco::Candidate * Daughter = jet.daughter(d);
             jet_daughter_e.back().push_back(Daughter->energy());
+            jet_daughter_px.back().push_back(Daughter->px());
+            jet_daughter_py.back().push_back(Daughter->py());
+            jet_daughter_pz.back().push_back(Daughter->pz());
             jet_daughter_pt.back().push_back(Daughter->pt());
             jet_daughter_eta.back().push_back(Daughter->eta());
             jet_daughter_phi.back().push_back(Daughter->phi());
@@ -284,12 +345,18 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       for (const pat::Jet &fatjet : *fatjets){
          pat::Jet uncorrFatjet = fatjet.correctedJet(0);
          fatjet_e.push_back(uncorrFatjet.energy());
+         fatjet_px.push_back(uncorrFatjet.px());
+         fatjet_py.push_back(uncorrFatjet.py());
+         fatjet_pz.push_back(uncorrFatjet.pz());
          fatjet_pt.push_back(uncorrFatjet.pt());
          fatjet_eta.push_back(uncorrFatjet.eta());
          fatjet_phi.push_back(uncorrFatjet.phi());
          fatjet_ch.push_back(uncorrFatjet.charge());
          fatjet_mass.push_back(uncorrFatjet.mass());
          fatjet_daughter_e.push_back({});
+         fatjet_daughter_px.push_back({});
+         fatjet_daughter_py.push_back({});
+         fatjet_daughter_pz.push_back({});
          fatjet_daughter_pt.push_back({});
          fatjet_daughter_eta.push_back({});
          fatjet_daughter_phi.push_back({});
@@ -307,6 +374,9 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                for(size_t gd=0; gd<Daughter->numberOfDaughters(); gd++){
                   const reco::Candidate * GrandDaughter = Daughter->daughter(gd);
                   fatjet_daughter_e.back().push_back(GrandDaughter->energy());
+                  fatjet_daughter_px.back().push_back(GrandDaughter->px());
+                  fatjet_daughter_py.back().push_back(GrandDaughter->py());
+                  fatjet_daughter_pz.back().push_back(GrandDaughter->pz());
                   fatjet_daughter_pt.back().push_back(GrandDaughter->pt());
                   fatjet_daughter_eta.back().push_back(GrandDaughter->eta());
                   fatjet_daughter_phi.back().push_back(GrandDaughter->phi());
@@ -316,6 +386,9 @@ Analyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                }
             }else{
                fatjet_daughter_e.back().push_back(Daughter->energy());
+               fatjet_daughter_px.back().push_back(Daughter->px());
+               fatjet_daughter_py.back().push_back(Daughter->py());
+               fatjet_daughter_pz.back().push_back(Daughter->pz());
                fatjet_daughter_pt.back().push_back(Daughter->pt());
                fatjet_daughter_eta.back().push_back(Daughter->eta());
                fatjet_daughter_phi.back().push_back(Daughter->phi());
