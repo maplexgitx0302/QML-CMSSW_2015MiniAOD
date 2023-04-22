@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 
 # data
 import awkward as ak
+import d_hep_data
 from d_hep_data import JetEvents
 
 # qml
@@ -37,7 +38,7 @@ from torch.nn import functional as F
 # pytorch_lightning
 import lightning as L
 import lightning.pytorch as pl
-import torchmetrics
+from lightning.pytorch.tuner import Tuner
 
 # pytorch_geometric
 import networkx as nx
@@ -77,27 +78,30 @@ cf["wandb"]   = True
 cf["project"] = "g_4vec_2pcqnn"
 
 # data infotmation
-cf["num_events"]    = "5000"
+cf["num_events"]    = "50000"
 cf["sig_channel"]   = "ZprimeToZhToZinvhbb"
 cf["bkg_channel"]   = "QCD_HT2000toInf"
 cf["jet_type"]      = "fatjet"
-cf["cut"]           = f"({cf['jet_type']}_pt>=500)&({cf['jet_type']}_pt<=1500)"
 cf["subjet_radius"] = 0.5
+cf["cut_limit"]     = (500, 1500)
+cf["bin"]           = 10
+cf["num_bin_data"]  = 100
 
 # traning configuration
-cf["num_train_ratio"] = 0.4
-cf["num_test_ratio"]  = 0.4
-cf["batch_size"]      = 64
-cf["num_workers"]     = 12
-cf["max_epochs"]      = 50
-cf["accelerator"]     = "gpu"
-cf["num_data"]        = 100
-cf["fast_dev_run"]    = False
+cf["num_train_ratio"]   = 0.5
+cf["num_test_ratio"]    = 0.5
+cf["batch_size"]        = 16
+cf["num_workers"]       = 12
+cf["max_epochs"]        = 50
+cf["accelerator"]       = "gpu" if torch.cuda.is_available() else "cpu"
+cf["num_data"]          = cf["bin"] * cf["num_bin_data"]
+cf["fast_dev_run"]      = False
+cf["log_every_n_steps"] = cf["batch_size"] // 2
 
 # model hyperparameters
 cf["loss_function"]  = nn.BCEWithLogitsLoss()
-cf["optimizer"]      = optim.AdamW
-cf["learning_rate"]  = 1E-4
+cf["optimizer"]      = optim.Adam
+cf["learning_rate"]  = 1E-3
 
 # 2PCNN hyperparameters
 cf["gnn_layers"] = 1
@@ -105,8 +109,11 @@ cf["mlp_layers"] = 2
 
 # %%
 """
-### Data Module
+## Data Module
+"""
 
+# %%
+"""
 In this project, we train with data containing only the four momentum of particles. In order to reduce the size of the data (due to the long training time for quantum machine learning), we reduce the size of data by `fastjet` package by clustering particles again by `anti-kt algorithm` with smaller radius.
 
 The detail (source code) for creating fastjet reclustering events is in the `d_hep_data` file.
@@ -115,76 +122,76 @@ To test the power of QML for learning space structure of data (geometric angles,
 """
 
 # %%
+def events_pt_eta_phi(events, norm):
+    if norm:
+        f1 = 2 * np.arctan(events["_pt"] / events["pt"])
+        f2 = np.pi * events["_delta_eta"]
+        f3 = np.pi * events["_delta_phi"]
+        arrays = ak.zip([f1, f2, f3])
+    else:
+        f1 = events["_pt"]
+        f2 = events["_delta_eta"]
+        f3 = events["_delta_phi"]
+        arrays = ak.zip([f1, f2, f3])
+    arrays = arrays.to_list()
+    x = [torch.tensor(arrays[i], dtype=torch.float32) for i in range(len(arrays))]
+    return x
+
+# %%
 class JetDataModule(pl.LightningDataModule):
-    def __init__(self, features):
+    def __init__(self, events_func, tune_batch=False, **kwargs):
         '''Add a "_" prefix if it is a fastjet feature'''
         super().__init__()
-        # jet events
-        self.sig_data_list = self._create_data_list(cf["sig_channel"], features, 1)
-        self.bkg_data_list = self._create_data_list(cf["bkg_channel"], features, 0)
+        self.batch_size = 1 if tune_batch else cf["batch_size"]
 
-        # count the number of training, validation, and testing
+        # jet events
+        arg_events = [cf["num_events"], cf["jet_type"], cf["subjet_radius"], cf["cut_limit"], cf["bin"], cf["num_bin_data"]]
+        sig_events = d_hep_data.events_uniform_Pt_weight(cf["sig_channel"], *arg_events)
+        sig_events = events_func(sig_events, **kwargs)
+        bkg_events = d_hep_data.events_uniform_Pt_weight(cf["bkg_channel"], *arg_events)
+        bkg_events = events_func(bkg_events, **kwargs)
+        self.sig_data_list = self._create_data_list(sig_events, 1)
+        self.bkg_data_list = self._create_data_list(bkg_events, 0)
+
+        # count the number of training, and testing
         assert len(self.sig_data_list) >= cf["num_data"], f"sig data not enough: {len(self.sig_data_list)} < {cf['num_data']}"
         assert len(self.bkg_data_list) >= cf["num_data"], f"bkg data not enough: {len(self.bkg_data_list)} < {cf['num_data']}"
         num_train = int(cf["num_data"] * cf["num_train_ratio"])
         num_test  = int(cf["num_data"] * cf["num_test_ratio"])
-        num_valid = cf["num_data"] - num_train - num_test
         print(f"DataLog: {cf['sig_channel']} has {len(self.sig_data_list)} events and {cf['bkg_channel']} has {len(self.bkg_data_list)} events.")
-        print(f"Choose num_data for each channel to be {cf['num_data']} | Each channel  has num_train = {num_train}, num_valid = {num_valid}, num_test = {num_test}")
+        print(f"Choose num_data for each channel to be {cf['num_data']} | Each channel  has num_train = {num_train}, num_test = {num_test}")
 
         # prepare dataset for dataloader
         train_idx = num_train
-        valid_idx = num_train + num_valid
-        test_idx  = num_train + num_valid + num_test
+        test_idx  = num_train + num_test
         self.train_dataset = self.sig_data_list[:train_idx] + self.bkg_data_list[:train_idx]
-        self.valid_dataset = self.sig_data_list[train_idx:valid_idx] + self.bkg_data_list[train_idx:valid_idx]
-        self.test_dataset  = self.sig_data_list[valid_idx:test_idx] + self.bkg_data_list[valid_idx:test_idx]
+        self.test_dataset  = self.sig_data_list[train_idx:test_idx] + self.bkg_data_list[train_idx:test_idx]
     
-    def _create_data_list(self, channel, features, y):
-        # use fastjet to recluster jet events into subjet events
-        jet_events     = JetEvents(channel, cf["num_events"], cf["jet_type"], cf["cut"])
-        fastjet_events = jet_events.fastjet_events(R=cf["subjet_radius"])
-        # list for saving pytorch_geometric "Data"
-        data_list  = []
-        for i in range(len(fastjet_events)):
-            # extract data from events
-            e_parent   = jet_events.events[i]
-            e_daughter = fastjet_events[i]
-            x_list = []
-            # select feature in the order
-            for feature in features:
-                # fastjet feature
-                if feature[0] == "_":
-                    x = e_daughter[f"{feature[1:]}"]
-                    x = torch.tensor(x, dtype=torch.float32).reshape(-1, 1)
-                # parent jet feature
-                else:
-                    x = e_parent[f"{cf['jet_type']}_{feature}"]
-                    x = torch.tensor(x, dtype=torch.float32)
-                    x = x.repeat(len(e_daughter)).reshape(-1, 1)
-                x_list.append(x)
-            x_tensor = torch.cat(x_list, dim=1)
-            # create pytorch_geometric "Data" object
-            edge_index = list(product(range(len(e_daughter)), range(len(e_daughter))))
+    def _create_data_list(self, events, y):
+        # create pytorch_geometric "Data" object
+        data_list = []
+        for i in range(len(events)):
+            x = events[i]
+            edge_index = list(product(range(len(x)), range(len(x))))
             edge_index = torch.tensor(edge_index).transpose(0, 1)
-            x_tensor.requires_grad, edge_index.requires_grad = False, False
-            data_list.append(Data(x=x_tensor, edge_index=edge_index, y=y))
+            x.requires_grad, edge_index.requires_grad = False, False
+            data_list.append(Data(x=x, edge_index=edge_index, y=y))
         random.shuffle(data_list)
         return data_list
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=cf["batch_size"], num_workers=cf["num_workers"],  shuffle=True)
-
-    def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=cf["batch_size"], num_workers=cf["num_workers"])
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=cf["num_workers"],  shuffle=True)
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=cf["batch_size"], num_workers=cf["num_workers"])
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=cf["num_workers"])
 
 # %%
 """
 ## Models
+"""
 
+# %%
+"""
 To compare classical GNN with quantum GNN, we use `GraphConv` and `MessagePassing` with `pennylane` for classical and quantum repectively.
 
 - Why using `nn.ModuleList` instead of `nn.Sequential`?
@@ -348,12 +355,6 @@ class LitModel(L.LightningModule):
         self.log("train_acc", acc, on_step=True, on_epoch=True, batch_size=len(data.x))
         return loss
 
-    def validation_step(self, data, batch_idx):
-        loss, acc = self.forward(data)
-        self.log("train_loss", loss, on_step=True, on_epoch=True, batch_size=len(data.x))
-        self.log("train_acc", acc, on_step=True, on_epoch=True, batch_size=len(data.x))
-        return loss
-
     def test_step(self, data, batch_idx):
         _, acc = self.forward(data)
         self.log("test_acc", acc, on_step=True, on_epoch=True, batch_size=len(data.x))
@@ -369,10 +370,10 @@ class LitModel(L.LightningModule):
 """
 
 # %%
-def train(model, data_module, suffix=""):
+def train(model, data_module, tune_batch=False, suffix=""):
     # setup id and path for saving
     project  = cf['project']
-    group    = f"{cf['num_data']}_{cf['sig_channel']}_{cf['bkg_channel']}_{cf['jet_type']}_{cf['cut']}"
+    group    = f"{cf['num_data']}_{cf['sig_channel']}_{cf['bkg_channel']}_{cf['jet_type']}_R{cf['subjet_radius']}"
     job_type = model.__class__.__name__
     name     = f"{job_type}_{cf['time']}_{suffix}"
     id       = f"{group}_{name}"
@@ -382,14 +383,34 @@ def train(model, data_module, suffix=""):
 
     # wandb logger setup
     if cf["wandb"]:
+        # try:
+        #     # check runs
+        #     api = wandb.Api()
+        #     for run in api.runs(f"ntuyianchen/{project}"):
+        #         if f"{group}_{job_type}" in run.id and suffix in run.id:
+        #             run = api.run(f"ntuyianchen/{project}/"+run.id)
+        #             run.delete()
+        # except ValueError as e:
+        #     print(e)
+        #     print(f"Now creating new project {project}")
         wandb_logger = WandbLogger(project=project, group=group, job_type=job_type, name=name, id=id, save_dir=root_dir)
         wandb_logger.experiment.config.update(cf)
         wandb_logger.watch(model, log="all")
-    
+
     # start lightning training
     logger   = wandb_logger if cf["wandb"] else None
-    trainer  = L.Trainer(logger=logger, accelerator=cf["accelerator"], max_epochs=cf["max_epochs"], fast_dev_run=cf["fast_dev_run"])
+    trainer  = L.Trainer(
+        logger=logger, 
+        accelerator       = cf["accelerator"], 
+        max_epochs        = cf["max_epochs"], 
+        fast_dev_run      = cf["fast_dev_run"],
+        log_every_n_steps = cf["log_every_n_steps"],
+        )
     litmodel = LitModel(model)
+    
+    if tune_batch:
+        tuner = Tuner(trainer)
+        tuner.scale_batch_size(litmodel, datamodule=data_module, mode="binsearch")
     trainer.fit(litmodel, datamodule=data_module)
     trainer.test(litmodel, datamodule=data_module)
 
@@ -399,22 +420,14 @@ def train(model, data_module, suffix=""):
 
 # %%
 """
-### Create datamodules
-"""
-
-# %%
-# load data
-# data_module = JetDataModule(features=["e", "pt", "_e", "_pt", "_delta_eta", "_delta_phi"])
-data_module = JetDataModule(features=["_pt", "_delta_eta", "_delta_phi"])
-input_dim   = data_module.train_dataset[0].x.shape[1]
-
-# %%
-"""
 ### Start training each model
 """
 
 # %%
 # classical 2pcnn
+data_pt_eta_phi = JetDataModule(events_func=events_pt_eta_phi, norm=False)
+data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
+input_dim = data_pt_eta_phi.train_dataset[0].x.shape[1]
 cf_2pcnn = {
     "gnn_in":input_dim, 
     "gnn_layers":cf["gnn_layers"],
@@ -424,8 +437,12 @@ cf_2pcnn = {
     "mlp_hidden":3*input_dim, 
     "mlp_layers":cf["mlp_layers"],
 }
+train(Classical2PCNNForward(**cf_2pcnn), data_module=data_pt_eta_phi, suffix="pt_eta_phi")
+train(Classical2PCNNForward(**cf_2pcnn), data_module=data_pt_eta_phi_norm, suffix="pt_eta_phi_norm")
 
 # quantum 2pcqnn
+data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
+input_dim = data_pt_eta_phi_norm.train_dataset[0].x.shape[1]
 cf_2pcqnn = {
     "gnn_in":input_dim, 
     "gnn_layers":cf["gnn_layers"],
@@ -433,9 +450,7 @@ cf_2pcqnn = {
     "gnn_aggr":"add",
     "mlp_in":input_dim, 
     "mlp_out":1, 
-    "mlp_hidden":input_dim, 
+    "mlp_hidden":3*input_dim, 
     "mlp_layers":cf["mlp_layers"],
 }
-
-train(Classical2PCNNForward(**cf_2pcnn), data_module=data_module)
-train(Quantum2PCQNNForward(**cf_2pcqnn), data_module=data_module)
+train(Quantum2PCQNNForward(**cf_2pcqnn), data_module=data_pt_eta_phi_norm, suffix="pt_eta_phi_norm")
