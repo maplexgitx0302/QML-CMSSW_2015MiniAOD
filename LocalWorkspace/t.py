@@ -179,7 +179,7 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
             name += "_" + name_suffix
 
         # id
-        id = group + "_" + job_type + "_" + name
+        id = group + "_" + name
 
         # wandb logger
         wandb_logger = WandbLogger(project="t_qml_time", group=group, job_type=job_type, name=name, id=id, save_dir=f"./result")
