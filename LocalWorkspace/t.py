@@ -174,12 +174,15 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
         name  = global_time + "_"
         if name_prefix != "":
             name += name_prefix + "_"
-        name  += f"{job_type}_batch{dcf['batch_size']}_worker{dcf['num_workers']}"
+        name  += f"{job_type}_batch{dcf['batch_size']}_worker{dcf['num_workers']}_dim{dcf['num_dim']}"
         if name_suffix != "":
             name += "_" + name_suffix
 
+        # id
+        id = group + "_" + job_type + "_" + name
+
         # wandb logger
-        wandb_logger = WandbLogger(project="t_qml_time", group=group, job_type=job_type, name=name, id=name, save_dir=f"./result")
+        wandb_logger = WandbLogger(project="t_qml_time", group=group, job_type=job_type, name=name, id=id, save_dir=f"./result")
         wandb_logger.experiment.config.update(mcf)
         wandb_logger.experiment.config.update(dcf)
         wandb_logger.watch(model, log="all")
@@ -225,6 +228,8 @@ q_tuple = [
     ("default.qubit", "backprop", "torch"),
     ("lightning.qubit", "adjoint", "auto"),
     ("lightning.qubit", "adjoint", "torch"),
+    # ("lightning.gpu", "adjoint", "auto"),
+    # ("lightning.gpu", "adjoint", "torch"),
 ]
 
 for c_device, num_dim, batch_size, num_workers in l_product:
