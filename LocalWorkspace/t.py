@@ -35,6 +35,9 @@ torch.backends.cudnn.benchmark = False
 # faster calculation on GPU but less precision
 torch.set_float32_matmul_precision("medium")
 
+# current time
+global_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+
 # %%
 """
 ### QML NN Model
@@ -151,9 +154,6 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
     mcf = model_config
     dcf = data_config
     if wb == True:
-        # local time
-        _time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        
         # group
         group = ""
         if group_prefix != "":
@@ -171,7 +171,7 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
             job_type += "_" + job_type_suffix
 
         # name
-        name  = _time + "_"
+        name  = global_time + "_"
         if name_prefix != "":
             name += name_prefix + "_"
         name  += f"{job_type}_batch{dcf['batch_size']}_worker{dcf['num_workers']}"
@@ -203,18 +203,19 @@ real_test = True
 
 if real_test:
     wb = True
-    l_num_dim     = [2, 4, 8, 12, 16]
-    l_cpu_batch   = [16, 64, 256]
-    l_gpu_batch   = [16, 64]
+    l_num_dim     = [4, 8, 12, 16]
+    l_cpu_batch   = [16, 32, 64]
+    l_gpu_batch   = [16, 32, 64]
     l_num_workers = [0]
     l_product     = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers)) + list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
-else:
-    wb = False
-    l_num_dim     = [16]
-    l_cpu_batch   = [256]
-    l_gpu_batch   = [64]
-    l_num_workers = [0]
-    l_product     = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers)) + list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
+
+# else:
+#     wb = False
+#     l_num_dim     = [16]
+#     l_cpu_batch   = [256]
+#     l_gpu_batch   = [64]
+#     l_num_workers = [0]
+#     l_product     = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers)) + list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
 
 q_tuple = [
     # (q_device, q_diff, q_interface)
