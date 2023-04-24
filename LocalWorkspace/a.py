@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 # data
 import awkward as ak
 import d_hep_data
-from d_hep_data import JetEvents
 
 # qml
 import pennylane as qml
@@ -33,12 +32,10 @@ from pennylane import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.nn import functional as F
 
 # pytorch_lightning
 import lightning as L
 import lightning.pytorch as pl
-from lightning.pytorch.tuner import Tuner
 
 # pytorch_geometric
 import networkx as nx
@@ -46,6 +43,9 @@ import torch_geometric.nn as geom_nn
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn import MessagePassing
+
+# scipy
+from sklearn import metrics
 
 # wandb
 import wandb
@@ -73,28 +73,29 @@ Hyperparameters and configurations for:
 # %%
 # configuration dictionary
 cf = {}
-cf["time"]    = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-cf["wandb"]   = True
-cf["project"] = "g_4vec_2pcqnn"
+cf["time"]     = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+cf["wandb"]    = True
+cf["project"]  = "g_4vec_2pcqnn"
+cf["rnd_seed"] = None # to be determined by for loop
 
 # data infotmation
 cf["num_events"]    = "50000"
 cf["sig_channel"]   = "ZprimeToZhToZinvhbb"
 cf["bkg_channel"]   = "QCD_HT2000toInf"
 cf["jet_type"]      = "fatjet"
-cf["subjet_radius"] = 0.5
+cf["subjet_radius"] = None # to be determined from [0.25, 0.5, 0.75]
 cf["cut_limit"]     = (500, 1500)
 cf["bin"]           = 10
-cf["num_bin_data"]  = 100
+cf["num_bin_data"]  = None # to be determined from [100, 200, 300]
 
 # traning configuration
 cf["num_train_ratio"]   = 0.5
 cf["num_test_ratio"]    = 0.5
-cf["batch_size"]        = 16
-cf["num_workers"]       = 12
-cf["max_epochs"]        = 50
-cf["accelerator"]       = "gpu" if torch.cuda.is_available() else "cpu"
-cf["num_data"]          = cf["bin"] * cf["num_bin_data"]
+cf["batch_size"]        = 64
+cf["num_workers"]       = 0
+cf["max_epochs"]        = 100
+cf["accelerator"]       = "cpu"
+cf["num_data"]          = None # to be determined = bin * num_bin_data
 cf["fast_dev_run"]      = False
 cf["log_every_n_steps"] = cf["batch_size"] // 2
 
@@ -124,8 +125,8 @@ To test the power of QML for learning space structure of data (geometric angles,
 # %%
 def events_pt_eta_phi(events, norm):
     if norm:
-        f1 = 2 * np.arctan(events["_pt"] / events["pt"])
-        f2 = np.pi * events["_delta_eta"]
+        f1 = np.arctan(events["_pt"] / events["pt"])
+        f2 = np.pi / 2 * events["_delta_eta"]
         f3 = np.pi * events["_delta_phi"]
         arrays = ak.zip([f1, f2, f3])
     else:
@@ -139,11 +140,9 @@ def events_pt_eta_phi(events, norm):
 
 # %%
 class JetDataModule(pl.LightningDataModule):
-    def __init__(self, events_func, tune_batch=False, **kwargs):
+    def __init__(self, events_func, **kwargs):
         '''Add a "_" prefix if it is a fastjet feature'''
         super().__init__()
-        self.batch_size = 1 if tune_batch else cf["batch_size"]
-
         # jet events
         arg_events = [cf["num_events"], cf["jet_type"], cf["subjet_radius"], cf["cut_limit"], cf["bin"], cf["num_bin_data"]]
         sig_events = d_hep_data.events_uniform_Pt_weight(cf["sig_channel"], *arg_events)
@@ -180,10 +179,10 @@ class JetDataModule(pl.LightningDataModule):
         return data_list
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=cf["num_workers"],  shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=cf["batch_size"], num_workers=cf["num_workers"],  shuffle=True)
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=cf["num_workers"])
+        return DataLoader(self.test_dataset, batch_size=cf["batch_size"], num_workers=cf["num_workers"])
 
 # %%
 """
@@ -222,7 +221,7 @@ class QuantumMLP(nn.Module):
     def __init__(self, num_qubits, num_layers, num_reupload, measurements):
         super().__init__()
         # create a quantum MLP
-        @qml.qnode(qml.device('default.qubit', wires=num_qubits))
+        @qml.qnode(qml.device('lightning.qubit', wires=num_qubits), diff_method="adjoint")
         def circuit(inputs, weights):
             for i in range(num_reupload):
                 qml.AngleEmbedding(features=inputs, wires=range(num_qubits), rotation='Y')
@@ -246,7 +245,7 @@ class Classical2PCNNForwardMP(MessagePassing):
     def __init__(self, num_features, num_layers, aggr):
         super().__init__(aggr=aggr)
         self.mp_phi = ClassicalMLP(
-            in_channel     = 2*num_features, 
+            in_channel     = 2*num_features,
             out_channel    = num_features,
             hidden_channel = 2*num_features,
             num_layers     = num_layers,
@@ -343,11 +342,36 @@ class LitModel(L.LightningModule):
         y_true = data.y
         loss   = self.loss_function(x, y_true.float())
         acc    = (y_pred == data.y).float().mean()
+
+        # calculate auc
+        y_score = torch.sigmoid(x).detach()
+        self.y_true_buffer  = torch.cat((self.y_true_buffer, y_true))
+        self.y_score_buffer = torch.cat((self.y_score_buffer, y_score))
         return loss, acc
 
     def configure_optimizers(self):
         optimizer = cf["optimizer"](self.parameters(), lr=cf["learning_rate"])
         return optimizer
+
+    def on_train_epoch_start(self):
+        self.start_time     = time.time()
+        self.y_true_buffer  = torch.tensor([])
+        self.y_score_buffer = torch.tensor([])
+
+    def on_train_epoch_end(self):
+        self.end_time = time.time()
+        delta_time = self.end_time - self.start_time
+        roc_auc    = metrics.roc_auc_score(self.y_true_buffer, self.y_score_buffer)
+        self.log("epoch_time", delta_time, on_step=False, on_epoch=True)
+        self.log("train_roc_auc", roc_auc, on_step=False, on_epoch=True)
+
+    def on_test_epoch_start(self):
+        self.y_true_buffer  = torch.tensor([])
+        self.y_score_buffer = torch.tensor([])
+
+    def on_test_epoch_end(self):
+        roc_auc = metrics.roc_auc_score(self.y_true_buffer, self.y_score_buffer)
+        self.log("test_roc_auc", roc_auc, on_step=False, on_epoch=True)
 
     def training_step(self, data, batch_idx):
         loss, acc = self.forward(data)
@@ -370,30 +394,23 @@ class LitModel(L.LightningModule):
 """
 
 # %%
-def train(model, data_module, tune_batch=False, suffix=""):
+def train(model, data_module, commit="", suffix=""):
     # setup id and path for saving
     project  = cf['project']
-    group    = f"{cf['num_data']}_{cf['sig_channel']}_{cf['bkg_channel']}_{cf['jet_type']}_R{cf['subjet_radius']}"
-    job_type = model.__class__.__name__
-    name     = f"{job_type}_{cf['time']}_{suffix}"
-    id       = f"{group}_{name}"
+    group    = f"{cf['time']}_{commit}_{cf['sig_channel']}_{cf['bkg_channel']}_{cf['jet_type']}"
+    job_type = f"R{cf['subjet_radius']}_D{cf['num_data']}"
+    name     = f"{model.__class__.__name__}_{suffix} | {job_type} | {group} | {cf['rnd_seed']}"
+    id       = f"{name}"
+    tags     = [model.__class__.__name__, cf['sig_channel'], cf['bkg_channel'], cf['jet_type'], str(cf['subjet_radius']), str(cf['num_data'])]
     root_dir = f"./result"
     if not os.path.isdir(root_dir):
         os.makedirs(root_dir)
 
     # wandb logger setup
     if cf["wandb"]:
-        # try:
-        #     # check runs
-        #     api = wandb.Api()
-        #     for run in api.runs(f"ntuyianchen/{project}"):
-        #         if f"{group}_{job_type}" in run.id and suffix in run.id:
-        #             run = api.run(f"ntuyianchen/{project}/"+run.id)
-        #             run.delete()
-        # except ValueError as e:
-        #     print(e)
-        #     print(f"Now creating new project {project}")
-        wandb_logger = WandbLogger(project=project, group=group, job_type=job_type, name=name, id=id, save_dir=root_dir)
+        cf["group_rnd_seed"] = f"{model.__class__.__name__}_{suffix} | {job_type}"
+        cf["model_name"]     = model.__class__.__name__
+        wandb_logger = WandbLogger(project=project, group=group, job_type=job_type, name=name, id=id, save_dir=root_dir, tags=tags)
         wandb_logger.experiment.config.update(cf)
         wandb_logger.watch(model, log="all")
 
@@ -401,16 +418,12 @@ def train(model, data_module, tune_batch=False, suffix=""):
     logger   = wandb_logger if cf["wandb"] else None
     trainer  = L.Trainer(
         logger=logger, 
-        accelerator       = cf["accelerator"], 
-        max_epochs        = cf["max_epochs"], 
+        accelerator       = cf["accelerator"],
+        max_epochs        = cf["max_epochs"],
         fast_dev_run      = cf["fast_dev_run"],
         log_every_n_steps = cf["log_every_n_steps"],
         )
     litmodel = LitModel(model)
-    
-    if tune_batch:
-        tuner = Tuner(trainer)
-        tuner.scale_batch_size(litmodel, datamodule=data_module, mode="binsearch")
     trainer.fit(litmodel, datamodule=data_module)
     trainer.test(litmodel, datamodule=data_module)
 
@@ -424,33 +437,48 @@ def train(model, data_module, tune_batch=False, suffix=""):
 """
 
 # %%
-# classical 2pcnn
-data_pt_eta_phi = JetDataModule(events_func=events_pt_eta_phi, norm=False)
-data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
-input_dim = data_pt_eta_phi.train_dataset[0].x.shape[1]
-cf_2pcnn = {
-    "gnn_in":input_dim, 
-    "gnn_layers":cf["gnn_layers"],
-    "gnn_aggr":"add", 
-    "mlp_in":input_dim,
-    "mlp_out":1, 
-    "mlp_hidden":3*input_dim, 
-    "mlp_layers":cf["mlp_layers"],
-}
-train(Classical2PCNNForward(**cf_2pcnn), data_module=data_pt_eta_phi, suffix="pt_eta_phi")
-train(Classical2PCNNForward(**cf_2pcnn), data_module=data_pt_eta_phi_norm, suffix="pt_eta_phi_norm")
+def grid_train(rnd_seed, num_bin_data, R, commit=""):
+    # setup
+    L.seed_everything(rnd_seed)
+    cf["subjet_radius"] = R
+    cf["rnd_seed"]      = rnd_seed
+    cf["num_bin_data"]  = num_bin_data
+    cf["num_data"]      = cf["bin"] * cf["num_bin_data"]
 
-# quantum 2pcqnn
-data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
-input_dim = data_pt_eta_phi_norm.train_dataset[0].x.shape[1]
-cf_2pcqnn = {
-    "gnn_in":input_dim, 
-    "gnn_layers":cf["gnn_layers"],
-    "gnn_reupload":input_dim,
-    "gnn_aggr":"add",
-    "mlp_in":input_dim, 
-    "mlp_out":1, 
-    "mlp_hidden":3*input_dim, 
-    "mlp_layers":cf["mlp_layers"],
-}
-train(Quantum2PCQNNForward(**cf_2pcqnn), data_module=data_pt_eta_phi_norm, suffix="pt_eta_phi_norm")
+    # data module
+    data_pt_eta_phi = JetDataModule(events_func=events_pt_eta_phi, norm=False)
+    data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
+
+    # classical 2pcnn
+    input_dim = data_pt_eta_phi.train_dataset[0].x.shape[1]
+    cf_2pcnn = {
+        "gnn_in":input_dim, 
+        "gnn_layers":cf["gnn_layers"],
+        "gnn_aggr":"add", 
+        "mlp_in":input_dim,
+        "mlp_out":1, 
+        "mlp_hidden":3*input_dim, 
+        "mlp_layers":cf["mlp_layers"],
+    }
+    train(Classical2PCNNForward(**cf_2pcnn), data_pt_eta_phi, commit, suffix=f"pep")
+    train(Classical2PCNNForward(**cf_2pcnn), data_pt_eta_phi_norm, commit, suffix=f"pep_norm")
+
+    # quantum 2pcqnn
+    input_dim = data_pt_eta_phi_norm.train_dataset[0].x.shape[1]
+    cf_2pcqnn = {
+        "gnn_in":input_dim,
+        "gnn_layers":cf["gnn_layers"],
+        "gnn_reupload":input_dim,
+        "gnn_aggr":"add",
+        "mlp_in":input_dim,
+        "mlp_out":1,
+        "mlp_hidden":3*input_dim,
+        "mlp_layers":cf["mlp_layers"],
+    }
+    # train(Quantum2PCQNNForward(**cf_2pcqnn), data_pt_eta_phi_norm, commit, suffix=f"pep_norm")
+
+commit = input("Commit of this experiment (short description): ")
+for R in [0.75, 0.5, 0.25]:
+    for num_bin_data in [100, 200, 400]:
+        for rnd_seed in range(3):
+            grid_train(rnd_seed, num_bin_data, R, commit)
