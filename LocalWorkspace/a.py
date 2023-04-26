@@ -95,7 +95,6 @@ cf["batch_size"]        = 64
 cf["num_workers"]       = 0
 cf["max_epochs"]        = 100
 cf["accelerator"]       = "cpu"
-cf["num_data"]          = None # to be determined = bin * num_bin_data
 cf["fast_dev_run"]      = False
 cf["log_every_n_steps"] = cf["batch_size"] // 2
 
@@ -105,8 +104,8 @@ cf["optimizer"]      = optim.Adam
 cf["learning_rate"]  = 1E-3
 
 # 2PCNN hyperparameters
-cf["gnn_layers"] = 1
-cf["mlp_layers"] = 2
+cf["gnn_layers"] = None # to be determined by grid search
+cf["mlp_layers"] = None # to be determined by grid search
 
 # %%
 """
@@ -140,25 +139,25 @@ def events_pt_eta_phi(events, norm):
 
 # %%
 class JetDataModule(pl.LightningDataModule):
-    def __init__(self, events_func, **kwargs):
+    def __init__(self, sig_buffer, bkg_buffer, events_func, **kwargs):
         '''Add a "_" prefix if it is a fastjet feature'''
         super().__init__()
         # jet events
-        arg_events = [cf["num_events"], cf["jet_type"], cf["subjet_radius"], cf["cut_limit"], cf["bin"], cf["num_bin_data"]]
-        sig_events = d_hep_data.events_uniform_Pt_weight(cf["sig_channel"], *arg_events)
+        sig_events = sig_buffer.get_uniform_bin_data()
+        bkg_events = bkg_buffer.get_uniform_bin_data()
         sig_events = events_func(sig_events, **kwargs)
-        bkg_events = d_hep_data.events_uniform_Pt_weight(cf["bkg_channel"], *arg_events)
         bkg_events = events_func(bkg_events, **kwargs)
         self.sig_data_list = self._create_data_list(sig_events, 1)
         self.bkg_data_list = self._create_data_list(bkg_events, 0)
 
         # count the number of training, and testing
-        assert len(self.sig_data_list) >= cf["num_data"], f"sig data not enough: {len(self.sig_data_list)} < {cf['num_data']}"
-        assert len(self.bkg_data_list) >= cf["num_data"], f"bkg data not enough: {len(self.bkg_data_list)} < {cf['num_data']}"
-        num_train = int(cf["num_data"] * cf["num_train_ratio"])
-        num_test  = int(cf["num_data"] * cf["num_test_ratio"])
+        num_data = cf["bin"] * cf["num_bin_data"]
+        assert len(self.sig_data_list) >= num_data, f"sig data not enough: {len(self.sig_data_list)} < {num_data}"
+        assert len(self.bkg_data_list) >= num_data, f"bkg data not enough: {len(self.bkg_data_list)} < {num_data}"
+        num_train = int(num_data * cf["num_train_ratio"])
+        num_test  = int(num_data * cf["num_test_ratio"])
         print(f"DataLog: {cf['sig_channel']} has {len(self.sig_data_list)} events and {cf['bkg_channel']} has {len(self.bkg_data_list)} events.")
-        print(f"Choose num_data for each channel to be {cf['num_data']} | Each channel  has num_train = {num_train}, num_test = {num_test}")
+        print(f"Choose num_data for each channel to be {num_data} | Each channel  has num_train = {num_train}, num_test = {num_test}")
 
         # prepare dataset for dataloader
         train_idx = num_train
@@ -398,18 +397,26 @@ def train(model, data_module, commit="", suffix=""):
     # setup id and path for saving
     project  = cf['project']
     group    = f"{cf['time']}_{commit}_{cf['sig_channel']}_{cf['bkg_channel']}_{cf['jet_type']}"
-    job_type = f"R{cf['subjet_radius']}_D{cf['num_data']}"
-    name     = f"{model.__class__.__name__}_{suffix} | {job_type} | {group} | {cf['rnd_seed']}"
+    job_type = f"R{cf['subjet_radius']}_B{cf['bin']}_D{cf['num_bin_data']}"
+    name     = f"{model.__class__.__name__}_gl{cf['gnn_layers']}_ml{cf['mlp_layers']}_{suffix} | {job_type} | rnd_{cf['rnd_seed']} | {cf['time']}"
     id       = f"{name}"
-    tags     = [model.__class__.__name__, cf['sig_channel'], cf['bkg_channel'], cf['jet_type'], str(cf['subjet_radius']), str(cf['num_data'])]
+    tags     = [model.__class__.__name__, cf['sig_channel'], cf['bkg_channel'], cf['jet_type'], str(cf['subjet_radius'])]
     root_dir = f"./result"
     if not os.path.isdir(root_dir):
         os.makedirs(root_dir)
 
+    # check whether wandb name exists
+    api     = wandb.Api()
+    project = cf["project"]
+    if id in set([run.id for run in api.runs(f"ntuyianchen/{project}")]):
+        print(f"{id} already exists, skip this run")
+        return
+
     # wandb logger setup
     if cf["wandb"]:
-        cf["group_rnd_seed"] = f"{model.__class__.__name__}_{suffix} | {job_type}"
-        cf["model_name"]     = model.__class__.__name__
+        cf["model_structure"] = f"gl{cf['gnn_layers']}_ml{cf['mlp_layers']}"
+        cf["model_name"]      = model.__class__.__name__
+        cf["group_rnd_seed"]  = f"{cf['model_name']}_{cf['model_structure']}_{suffix} | {job_type}"
         wandb_logger = WandbLogger(project=project, group=group, job_type=job_type, name=name, id=id, save_dir=root_dir, tags=tags)
         wandb_logger.experiment.config.update(cf)
         wandb_logger.watch(model, log="all")
@@ -437,17 +444,13 @@ def train(model, data_module, commit="", suffix=""):
 """
 
 # %%
-def grid_train(rnd_seed, num_bin_data, R, commit=""):
+def grid_train(sig_buffer, bkg_buffer, commit=""):
     # setup
-    L.seed_everything(rnd_seed)
-    cf["subjet_radius"] = R
-    cf["rnd_seed"]      = rnd_seed
-    cf["num_bin_data"]  = num_bin_data
-    cf["num_data"]      = cf["bin"] * cf["num_bin_data"]
+    L.seed_everything(cf["rnd_seed"])
 
     # data module
-    data_pt_eta_phi = JetDataModule(events_func=events_pt_eta_phi, norm=False)
-    data_pt_eta_phi_norm = JetDataModule(events_func=events_pt_eta_phi, norm=True)
+    data_pt_eta_phi = JetDataModule(sig_buffer, bkg_buffer, events_func=events_pt_eta_phi, norm=False)
+    data_pt_eta_phi_norm = JetDataModule(sig_buffer, bkg_buffer, events_func=events_pt_eta_phi, norm=True)
 
     # classical 2pcnn
     input_dim = data_pt_eta_phi.train_dataset[0].x.shape[1]
@@ -477,8 +480,25 @@ def grid_train(rnd_seed, num_bin_data, R, commit=""):
     }
     # train(Quantum2PCQNNForward(**cf_2pcqnn), data_pt_eta_phi_norm, commit, suffix=f"pep_norm")
 
+# %%
+# use old date to keep run break runs
+old_time = input("Input old time if needed else just press enter: ")
+if old_time != "" or old_time != None:
+    cf["time"] = old_time
+
+# short description of this experiment
 commit = input("Commit of this experiment (short description): ")
-for R in [0.75, 0.5, 0.25]:
+
+for subjet_radius in [0.75, 0.5, 0.25]:
     for num_bin_data in [100, 200, 400]:
-        for rnd_seed in range(3):
-            grid_train(rnd_seed, num_bin_data, R, commit)
+        cf["subjet_radius"] = subjet_radius
+        cf["num_bin_data"]  = num_bin_data
+        arg_buffer = [cf["num_events"], cf["jet_type"], cf["subjet_radius"], cf["cut_limit"], cf["bin"], cf["num_bin_data"]]
+        sig_buffer = d_hep_data.UniformBinJetBuffer(cf["sig_channel"], *arg_buffer)
+        bkg_buffer = d_hep_data.UniformBinJetBuffer(cf["bkg_channel"], *arg_buffer)
+        for gl, ml in [(1,1), (1,2), (2,1), (2,2), (1,4), (4,1), (2,4), (4,2), (4,4)]:
+            cf["gnn_layers"] = gl
+            cf["mlp_layers"] = ml
+            for rnd_seed in range(5):
+                cf["rnd_seed"] = rnd_seed
+                grid_train(sig_buffer, bkg_buffer, commit)

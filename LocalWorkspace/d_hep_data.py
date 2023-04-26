@@ -100,47 +100,70 @@ class JetEvents:
         fastjet_array["delta_phi"] = fastjet_array["phi"] - self.events[f"{self.jet_type}_phi"]
         print(f"DataLog: Finish reclustering {self.channel} with anti-kt algorithm.")
         return fastjet_array
-    
-def events_uniform_Pt_weight(channel:str, num_events:int, jet_type:str, subjet_radius:float, cut_limit:tuple, bin:int, num_bin_data:int):
-    # set bin info
-    cut_lower, cut_upper = cut_limit
-    bin_width = (cut_upper - cut_lower) / bin
-    events = None
-    fastjet_events = None
 
-    # loop all bin
-    print(f"Datalog: start creating uniform pt weight events")
-    for i in range(bin):
-        cut = f"({jet_type}_pt>={cut_lower+i*bin_width})&({jet_type}_pt<{cut_lower+(i+1)*bin_width})"
-        bin_jet_events = JetEvents(channel=channel, num_events=num_events, jet_type=jet_type, cut=cut)
-        bin_events = bin_jet_events.events
-        bin_fastjet_events = bin_jet_events.fastjet_events(R=subjet_radius)
-        assert len(bin_events) >= num_bin_data, f"num of bin_events smaller then num_bin_data: {len(bin_events)} < {num_bin_data}"
+class UniformBinJetBuffer:
+    def __init__(self, channel:str, num_events:int, jet_type:str, subjet_radius:float, cut_limit:tuple, bin:int, num_bin_data:int):
+        self.channel       = channel
+        self.num_events    = num_events
+        self.jet_type      = jet_type
+        self.subjet_radius = subjet_radius
+        self.cut_limit     = cut_limit
+        self.bin           = bin
+        self.num_bin_data  = num_bin_data
 
-        idx = list(range(len(bin_events)))
-        random.shuffle(idx)
-        bin_events = bin_events[idx[:num_bin_data]]
-        bin_fastjet_events = bin_fastjet_events[idx[:num_bin_data]]
+        # create bins buffer
+        self.buffer_events = []
+        self.buffer_fastjet_events = []
+        cut_lower, cut_upper = cut_limit
+        bin_width = (cut_upper - cut_lower) / bin
+        for i in range(bin):
+            # cut the pt into bins, e.g., (500,600), (600,700), ... (1400,1500)
+            cut = f"({jet_type}_pt>={cut_lower+i*bin_width})&({jet_type}_pt<{cut_lower+(i+1)*bin_width})"
+            bin_jet_events = JetEvents(channel=channel, num_events=num_events, jet_type=jet_type, cut=cut)
+            bin_events = bin_jet_events.events
+            bin_fastjet_events = bin_jet_events.fastjet_events(R=subjet_radius)
+            assert len(bin_events) >= num_bin_data, f"num of bin_events smaller then num_bin_data: {len(bin_events)} < {num_bin_data}"
+            self.buffer_events.append(bin_events)
+            self.buffer_fastjet_events.append(bin_fastjet_events)
+            print(f"Datalog: Complete bin ({i+1}/{bin}) | cut = {cut}")
 
-        print(f"Datalog: bin ({i+1}/{bin}) | cut = {cut}")
-        events = ak.concatenate((events, bin_events), axis=0) if events is not None else bin_events
-        fastjet_events = ak.concatenate((fastjet_events, bin_fastjet_events), axis=0) if fastjet_events is not None else bin_fastjet_events
+    def get_uniform_bin_data(self):
+        # create uniform size bin data
+        events = None # will be the final events object
+        fastjet_events = None # will be the final fastjet object
+        for i in range(self.bin):
+            # get buffer data
+            bin_events = self.buffer_events[i]
+            bin_fastjet_events = self.buffer_fastjet_events[i]
+
+            # random select indices to get uniform size bin data
+            idx = list(range(len(bin_events)))
+            random.shuffle(idx)
+            bin_events = bin_events[idx[:self.num_bin_data]]
+            bin_fastjet_events = bin_fastjet_events[idx[:self.num_bin_data]]
+
+            # concatenate bin data into 
+            events = ak.concatenate((events, bin_events), axis=0) if events is not None else bin_events
+            fastjet_events = ak.concatenate((fastjet_events, bin_fastjet_events), axis=0) if fastjet_events is not None else bin_fastjet_events
         
-    # combine all fields
-    for field in events.fields:
-        try:
-            _, feature = field.split("_")
-            events[feature] = events[field]
-        except:
-            continue
-    for field in fastjet_events.fields:
-        events["_"+field] = fastjet_events[field]
+        # combine all fields
+        for field in events.fields:
+            try:
+                # we want to turn somthing like "jet_pt" into just "pt" and we want to ignore "jet_daughter_pt"
+                _, feature = field.split("_")
+                events[feature] = events[field]
+            except:
+                continue
+        
+        # all fastjet fields will have a prefix "_" in events fields
+        for field in fastjet_events.fields:
+            events["_"+field] = fastjet_events[field]
 
-    # other features
-    events["p"] = (events["px"]**2 + events["py"]**2 + events["pz"]**2) ** 0.5
-    events["_p"] = (events["_px"]**2 + events["_py"]**2 + events["_pz"]**2) ** 0.5
-    events["theta"] = np.arccos(events["pz"]/events["p"])
-    return events
+        # other useful features
+        events["p"] = (events["px"]**2 + events["py"]**2 + events["pz"]**2) ** 0.5
+        events["_p"] = (events["_px"]**2 + events["_py"]**2 + events["_pz"]**2) ** 0.5
+        events["theta"] = np.arccos(events["pz"]/events["p"])
+        return events
 
 # example
 if __name__ == '__main__':
