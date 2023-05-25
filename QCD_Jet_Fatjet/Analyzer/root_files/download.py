@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-num_events = 5000
+num_events = 10000
 channels = [
     "ZprimeToZhToZinvhbb",
     "ZprimeToZhToZlephbb",

@@ -5,7 +5,7 @@
 
 # %%
 # basic
-import os, time, itertools
+import os, time, itertools, subprocess
 
 # qml
 import pennylane as qml
@@ -37,6 +37,15 @@ torch.set_float32_matmul_precision("medium")
 
 # current time
 global_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+
+# get gpu name
+# if torch.cuda.is_available():
+#     gpu_command = "nvidia-smi --query-gpu=name --format=csv,noheader".split()
+#     gpu_name = subprocess.run(gpu_command, capture_output=True, text=True)
+#     gpu_name = gpu_name.stdout
+#     gpu_name = gpu_name.strip("\n")
+#     gpu_name = gpu_name.replace(" ", "_")
+gpu_name = "NVIDIA_RTX_4090"
 
 # %%
 """
@@ -104,6 +113,7 @@ class LitModel(L.LightningModule):
     
     def on_train_epoch_start(self):
         self.start_time = time.time()
+
     def on_train_epoch_end(self):
         self.end_time = time.time()
         delta_time = self.end_time - self.start_time
@@ -138,7 +148,7 @@ class RandomDataModule(pl.LightningDataModule):
         self.batch_size     = batch_size
         self.num_workers    = num_workers
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=self.num_workers,  shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
 # %%
 """
@@ -146,7 +156,7 @@ class RandomDataModule(pl.LightningDataModule):
 """
 
 # %%
-def test_time(wb, c_device, model_config, data_config, group_prefix="", group_suffix="", job_type_prefix="", job_type_suffix="", name_prefix="", name_suffix=""):
+def test_time(wb, c_device, model_config, data_config):
     model       = MLP(**model_config)
     litmodel    = LitModel(model)
     data_module = RandomDataModule(**data_config)
@@ -154,32 +164,10 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
     mcf = model_config
     dcf = data_config
     if wb == True:
-        # group
-        group = ""
-        if group_prefix != "":
-            group += group_prefix + "_"
-        group += f"dim{dcf['num_dim']}_rl{mcf['num_reupload']}_ql{mcf['num_qlayers']}_cl{mcf['num_clayers']}"
-        if group_suffix != "":
-            group += "_" + group_suffix
-
-        # job_type
-        job_type = ""
-        if job_type_prefix != "":
-            job_type += job_type_prefix + "_"
-        job_type += f"{c_device}|{mcf['q_device']}|diff_{mcf['q_diff']}|interface_{mcf['q_interface']}"
-        if job_type_suffix != "":
-            job_type += "_" + job_type_suffix
-
-        # name
-        name  = global_time + "_"
-        if name_prefix != "":
-            name += name_prefix + "_"
-        name  += f"{job_type}_batch{dcf['batch_size']}_worker{dcf['num_workers']}_dim{dcf['num_dim']}"
-        if name_suffix != "":
-            name += "_" + name_suffix
-
-        # id
-        id = group + "_" + name
+        group    = f"{global_time}_{gpu_name}"
+        job_type = f"{c_device}|{mcf['q_device']}|diff_{mcf['q_diff']}|interface_{mcf['q_interface']}"
+        name     = f"{job_type}|batch{dcf['batch_size']}|worker{dcf['num_workers']}|dim{dcf['num_dim']}"
+        id       = f"{group}|{name}"
 
         # wandb logger
         wandb_logger = WandbLogger(project="t_qml_time", group=group, job_type=job_type, name=name, id=id, save_dir=f"./result")
@@ -194,12 +182,15 @@ def test_time(wb, c_device, model_config, data_config, group_prefix="", group_su
         logger      = logger, 
         accelerator = c_device, 
         max_epochs  = 3,
+        log_every_n_steps = 1,
         )
 
+    print(f"Start testing {c_device}|{mcf['q_device']}|diff_{mcf['q_diff']}|interface_{mcf['q_interface']}|batch{dcf['batch_size']}|worker{dcf['num_workers']}|dim{dcf['num_dim']}")
     trainer.fit(litmodel, datamodule=data_module)
 
     if wb:
         wandb.finish()
+        print("#" * 100)
 
 # %%
 real_test = True
@@ -207,29 +198,27 @@ real_test = True
 if real_test:
     wb = True
     l_num_dim     = [4, 8, 12, 16]
-    l_cpu_batch   = [16, 32, 64]
-    l_gpu_batch   = [16, 32, 64]
-    l_num_workers = [0]
-    l_product     = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers)) + list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
+    l_cpu_batch   = [16, 64, 256]
+    l_gpu_batch   = [16, 64, 256]
+    l_num_workers = [0, 12, 24]
+    l_product     = list(itertools.product(["cpu", "gpu"], l_num_dim, l_cpu_batch, l_num_workers))
 
-# else:
-#     wb = False
-#     l_num_dim     = [16]
-#     l_cpu_batch   = [256]
-#     l_gpu_batch   = [64]
-#     l_num_workers = [0]
-#     l_product     = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers)) + list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
+else:
+    wb = False
+    l_num_dim     = [2]
+    l_cpu_batch   = [64]
+    l_gpu_batch   = [64]
+    l_num_workers = [0, 12, 24]
+    l_product     = list(itertools.product(["cpu", "gpu"], l_num_dim, l_cpu_batch, l_num_workers))
 
 q_tuple = [
-    # (q_device, q_diff, q_interface)
-    ("default.qubit", "best", "auto"),
-    ("default.qubit", "best", "torch"),
-    ("default.qubit", "backprop", "auto"),
-    ("default.qubit", "backprop", "torch"),
-    ("lightning.qubit", "adjoint", "auto"),
-    ("lightning.qubit", "adjoint", "torch"),
-    # ("lightning.gpu", "adjoint", "auto"),
-    # ("lightning.gpu", "adjoint", "torch"),
+    # (q_device       , q_diff    , q_interface)
+    ("default.qubit"  , "best"    , "auto"),
+    ("default.qubit"  , "best"    , "torch"),
+    ("lightning.qubit", "adjoint" , "auto"),
+    ("lightning.qubit", "adjoint" , "torch"),
+    ("lightning.gpu"  , "adjoint" , "auto"),
+    ("lightning.gpu"  , "adjoint" , "torch"),
 ]
 
 for c_device, num_dim, batch_size, num_workers in l_product:
@@ -250,4 +239,4 @@ for c_device, num_dim, batch_size, num_workers in l_product:
             "batch_size"  : batch_size,
             "num_workers" : num_workers,
         }
-        test_time(wb, c_device, model_config, data_config, job_type_prefix="ntugpu")
+        test_time(wb, c_device, model_config, data_config)
