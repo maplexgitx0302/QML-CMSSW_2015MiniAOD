@@ -36,7 +36,9 @@ torch.backends.cudnn.benchmark = False
 torch.set_float32_matmul_precision("medium")
 
 # current time
-global_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+global_time = input("Input time if needed:")
+if global_time == "":
+    global_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
 # get gpu name
 # if torch.cuda.is_available():
@@ -197,19 +199,23 @@ real_test = True
 
 if real_test:
     wb = True
-    l_num_dim     = [4, 8, 12, 16]
-    l_cpu_batch   = [16, 64, 256]
-    l_gpu_batch   = [16, 64, 256]
-    l_num_workers = [0, 12, 24]
-    l_product     = list(itertools.product(["cpu", "gpu"], l_num_dim, l_cpu_batch, l_num_workers))
+    l_num_dim     = [20]
+    l_cpu_batch   = [4, 8]
+    l_gpu_batch   = [4, 8]
+    l_num_workers = [0]
+    l_cpu_product = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers))
+    l_gpu_product = list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
+    l_product     = l_cpu_product + l_gpu_product
 
 else:
     wb = False
-    l_num_dim     = [2]
-    l_cpu_batch   = [64]
-    l_gpu_batch   = [64]
-    l_num_workers = [0, 12, 24]
-    l_product     = list(itertools.product(["cpu", "gpu"], l_num_dim, l_cpu_batch, l_num_workers))
+    l_num_dim     = [20]
+    l_cpu_batch   = [4, 8]
+    l_gpu_batch   = [4, 8]
+    l_num_workers = [0]
+    l_cpu_product = list(itertools.product(["cpu"], l_num_dim, l_cpu_batch, l_num_workers))
+    l_gpu_product = list(itertools.product(["gpu"], l_num_dim, l_gpu_batch, l_num_workers))
+    l_product     = l_gpu_product
 
 q_tuple = [
     # (q_device       , q_diff    , q_interface)
@@ -234,7 +240,7 @@ for c_device, num_dim, batch_size, num_workers in l_product:
             "num_chidden"  : 4 * num_dim,
         }
         data_config = {
-            "num_data"    : 512,
+            "num_data"    : 16,
             "num_dim"     : num_dim,
             "batch_size"  : batch_size,
             "num_workers" : num_workers,
