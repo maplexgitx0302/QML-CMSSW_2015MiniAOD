@@ -1,0 +1,246 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.12
+    cli_version: 0.15.3
+    framework: torch
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    start_time: 1687698004.074832
+    t:
+      1:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      - 77
+      2:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      - 77
+      3:
+      - 1
+      - 2
+      - 7
+      - 13
+      - 14
+      - 23
+      4: 3.9.12
+      5: 0.15.3
+      8:
+      - 1
+      - 5
+    m:
+    - 1: trainer/global_step
+      6:
+      - 3
+    - 1: train_loss_epoch
+      5: 1
+      6:
+      - 1
+    - 1: train_acc_epoch
+      5: 1
+      6:
+      - 1
+    - 1: epoch_time
+      5: 1
+      6:
+      - 1
+    - 1: train_roc_auc
+      5: 1
+      6:
+      - 1
+    - 1: epoch
+      5: 1
+      6:
+      - 1
+    - 1: train_loss_step
+      5: 1
+      6:
+      - 1
+    - 1: train_acc_step
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.weight._type
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.weight.values
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.weight.bins
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.bias._type
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.bias.values
+      5: 1
+      6:
+      - 1
+    - 1: parameters/gnn\.phi\.net\.bias.bins
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.weight._type
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.weight.values
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.weight.bins
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.bias._type
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.bias.values
+      5: 1
+      6:
+      - 1
+    - 1: parameters/mlp\.net\.bias.bins
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.bias._type
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.bias.values
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.bias.bins
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.weight._type
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.weight.values
+      5: 1
+      6:
+      - 1
+    - 1: gradients/mlp\.net\.weight.bins
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.bias._type
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.bias.values
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.bias.bins
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.weight._type
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.weight.values
+      5: 1
+      6:
+      - 1
+    - 1: gradients/gnn\.phi\.net\.weight.bins
+      5: 1
+      6:
+      - 1
+    - 1: test_acc_step
+      5: 1
+      6:
+      - 1
+    - 1: test_acc_epoch
+      5: 1
+      6:
+      - 1
+    - 1: test_roc_auc
+      5: 1
+      6:
+      - 1
+time:
+  desc: null
+  value: '20230625_205931'
+wandb:
+  desc: null
+  value: true
+project:
+  desc: null
+  value: g_eflow_2pcgnn
+num_train_ratio:
+  desc: null
+  value: 0.8
+batch_size:
+  desc: null
+  value: 64
+num_workers:
+  desc: null
+  value: 0
+max_epochs:
+  desc: null
+  value: 100
+accelerator:
+  desc: null
+  value: cpu
+fast_dev_run:
+  desc: null
+  value: false
+log_every_n_steps:
+  desc: null
+  value: 32
+sig:
+  desc: null
+  value: ZprimeToZhToZinvhbb
+bkg:
+  desc: null
+  value: QCD_HT2000toInf
+jet_type:
+  desc: null
+  value: fatjet
+subjet_radius:
+  desc: null
+  value: 0.25
+cut_limit:
+  desc: null
+  value:
+  - 800
+  - 1600
+bin:
+  desc: null
+  value: 5
+num_bin_data:
+  desc: null
+  value: 100
+model_name:
+  desc: null
+  value: Classical2PCGNN
+group_rnd:
+  desc: null
+  value: Classical2PCGNN_go6_gh0_gl0 | bin5-100
+group:
+  desc: null
+  value: ZprimeToZhToZinvhbb_QCD_HT2000toInf
+name:
+  desc: null
+  value: Classical2PCGNN_go6_gh0_gl0 | bin5-100 | bin_5 | rnd_0 | 20230625_205931
+id:
+  desc: null
+  value: Classical2PCGNN_go6_gh0_gl0 | bin5-100 | bin_5 | rnd_0 | 20230625_205931

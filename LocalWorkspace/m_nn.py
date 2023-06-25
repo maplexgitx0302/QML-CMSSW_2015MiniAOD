@@ -36,29 +36,3 @@ class QuantumMLP(nn.Module):
         self.net = nn.Sequential(*net)
     def forward(self, x):
         return self.net(x)
-
-# Message Passing by torch.cat
-class CatMessagePassing(MessagePassing):
-    def __init__(self, phi, gamma, aggr):
-        super().__init__(aggr=aggr, flow="target_to_source")
-        self.phi   = phi
-        self.gamma = gamma
-    def forward(self, x, edge_index):
-        return self.propagate(edge_index, x=x)
-    def message(self, x_i, x_j):
-        return self.phi(torch.cat((x_i, x_j), dim=-1))
-    def update(self, aggr_out, x):
-        return self.gamma(torch.cat((x, aggr_out), dim=-1))
-    
-# Message Passing by torch.cat, but in gamma, we throw out self information
-class RelativeCatMessagePassing(MessagePassing):
-    def __init__(self, phi, gamma, aggr):
-        super().__init__(aggr=aggr, flow="target_to_source")
-        self.phi   = phi
-        self.gamma = gamma
-    def forward(self, x, edge_index):
-        return self.propagate(edge_index, x=x)
-    def message(self, x_i, x_j):
-        return self.phi(torch.cat((x_i, x_j), dim=-1))
-    def update(self, aggr_out, x):
-        return self.gamma(torch.cat((aggr_out), dim=-1))

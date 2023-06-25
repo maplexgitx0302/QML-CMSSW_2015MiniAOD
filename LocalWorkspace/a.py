@@ -55,8 +55,9 @@ cf["rnd_seed"] = None # to be determined by for loop
 # data
 cf['sig_channel'] = "tetrahedron"
 cf['bkg_channel'] = "cube"
-cf['num_edges']   = 1
-cf["commit"]      = "center" # set center of polyhedron -> center of pos = (0,0,0)
+cf['num_edges']   = None # to be determined by for loop
+cf['bias_radius'] = 2
+cf["commit"]      = f"bias_{cf['bias_radius']}_atan" # set center of polyhedron -> center of pos = (0,0,0)
 
 # model
 cf['gnn_layers'] = 2
@@ -166,6 +167,12 @@ class PolyhedronDataModule(pl.LightningDataModule):
             edges = torch.tensor(edges).transpose(0, 1)
             # select Cartesian coordinates or Spherical coordinates
             nodes = torch.tensor(nodes, dtype=torch.float32)
+            # randomly give a bias
+            random_unit_bias = torch.rand(nodes.shape[1])
+            random_unit_bias = random_unit_bias / torch.norm(random_unit_bias)
+            random_bias = cf["bias_radius"] * np.random.rand() * random_unit_bias
+            random_bias = random_bias.repeat(nodes.shape[0], 1)
+            nodes = nodes + random_bias
             if coordinate == "cartesian":
                 pass
             elif coordinate == "spherical":
@@ -173,6 +180,12 @@ class PolyhedronDataModule(pl.LightningDataModule):
                 nodes_theta = torch.acos(nodes[:,2] / nodes_r).reshape(-1, 1)
                 nodes_phi   = torch.atan2(nodes[:,1], nodes[:,0]).reshape(-1, 1)
                 nodes = torch.cat([nodes_theta, nodes_phi], dim=1)
+            elif coordinate == "spherical_atan":
+                nodes_r     = torch.sqrt(torch.sum(nodes**2, dim=1))
+                nodes_theta = torch.acos(nodes[:,2] / nodes_r).reshape(-1, 1)
+                nodes_phi   = torch.atan2(nodes[:,1], nodes[:,0]).reshape(-1, 1)
+                nodes_atan  = torch.atan(nodes_r).reshape(-1, 1)
+                nodes = torch.cat([nodes_atan, nodes_theta, nodes_phi], dim=1)
             else:
                 raise ValueError(f"Unknown coordinate type: {coordinate}")
             # check whether nodes are valid -> no nan values
@@ -285,15 +298,22 @@ for edge in range(3):
         # data module
         data_cartesian = PolyhedronDataModule(num_data=cf["num_data"], num_edges=cf["num_edges"], coordinate="cartesian")
         data_spherical = PolyhedronDataModule(num_data=cf["num_data"], num_edges=cf["num_edges"], coordinate="spherical")
+        data_spherical_atan = PolyhedronDataModule(num_data=cf["num_data"], num_edges=cf["num_edges"], coordinate="spherical_atan")
 
         # cartesian
         cartesian_2pcnn  = ClassicalGeoGNN(num_features=3, gnn_layers=cf["gnn_layers"])
         cartesian_2pcqnn = QuantumGeoGNN(num_features=3, gnn_layers=cf["gnn_layers"])
-        train(cartesian_2pcnn, data_cartesian, commit=cf["commit"], suffix="cartesian")
-        train(cartesian_2pcqnn, data_cartesian, commit=cf["commit"], suffix="cartesian")
+        # train(cartesian_2pcnn, data_cartesian, commit=cf["commit"], suffix="cartesian")
+        # train(cartesian_2pcqnn, data_cartesian, commit=cf["commit"], suffix="cartesian")
 
         #spherical
         spherical_2pcnn  = ClassicalGeoGNN(num_features=2, gnn_layers=cf["gnn_layers"])
         spherical_2pcqnn = QuantumGeoGNN(num_features=2, gnn_layers=cf["gnn_layers"])
-        train(spherical_2pcnn, data_spherical, commit=cf["commit"], suffix="spherical")
-        train(spherical_2pcqnn, data_spherical, commit=cf["commit"], suffix="spherical")
+        # train(spherical_2pcnn, data_spherical, commit=cf["commit"], suffix="spherical")
+        # train(spherical_2pcqnn, data_spherical, commit=cf["commit"], suffix="spherical")
+
+        #spherical atan
+        spherical_2pcnn  = ClassicalGeoGNN(num_features=3, gnn_layers=cf["gnn_layers"])
+        spherical_2pcqnn = QuantumGeoGNN(num_features=3, gnn_layers=cf["gnn_layers"])
+        train(spherical_2pcnn, data_spherical_atan, commit=cf["commit"], suffix="spherical_atan")
+        train(spherical_2pcqnn, data_spherical_atan, commit=cf["commit"], suffix="spherical_atan")

@@ -1,0 +1,164 @@
+{
+    "os": "Linux-5.19.0-45-generic-x86_64-with-glibc2.35",
+    "python": "3.9.12",
+    "heartbeatAt": "2023-06-25T13:18:58.793436",
+    "startedAt": "2023-06-25T13:18:57.929413",
+    "docker": null,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/r08222011/QML_CMSSW_2015MiniAOD.git",
+        "commit": "7a6d8dde44d65cc1d51c81b477a45a2e3d54920f"
+    },
+    "email": "r08222011@gmail.com",
+    "root": "/home/yianchen/CMS_Open_Data_Workspace/CMSSW_7_6_7/src",
+    "host": "CMS-RTX4090",
+    "username": "yianchen",
+    "executable": "/home/yianchen/.pyenv/versions/3.9.12/bin/python",
+    "cpu_count": 12,
+    "cpu_count_logical": 24,
+    "cpu_freq": {
+        "current": 3109.177916666667,
+        "min": 3000.0,
+        "max": 4400.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 4326.04,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3163.611,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3033.924,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3196.224,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 4179.3,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3671.402,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2924.317,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3304.755,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3000.0,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2916.885,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3700.69,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2919.586,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 4356.199,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.411,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3429.35,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2986.244,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2937.162,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3853.68,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2923.51,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 4349.361,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3499.679,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2917.808,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 4351.476,
+            "min": 3000.0,
+            "max": 4400.0
+        },
+        {
+            "current": 2926.149,
+            "min": 3000.0,
+            "max": 4400.0
+        }
+    ],
+    "disk": {
+        "total": 1832.2072448730469,
+        "used": 140.19527053833008
+    },
+    "gpu": "NVIDIA Graphics Device",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA Graphics Device",
+            "memory_total": 25757220864
+        }
+    ],
+    "memory": {
+        "total": 124.94537353515625
+    }
+}

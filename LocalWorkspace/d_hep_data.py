@@ -21,7 +21,7 @@ _array   = ak.Array([{"px": 0.1, "py": 0.2, "pz": 0.3, "E": 0.4},])
 _cluster = fastjet.ClusterSequence(_array, _jet_def)
 
 class JetEvents:
-    def __init__(self, channel:str, num_events:int, jet_type:str, cut:str=None):
+    def __init__(self, channel:str, num_events:int, jet_type:str, cut:str=None, **kwargs):
         self.channel    = channel    # signal or background channel
         self.num_events = num_events # the "num_events" suffix of the loaded root file
         self.jet_type   = jet_type   # "jet" or "fatjet"
@@ -102,7 +102,7 @@ class JetEvents:
         return fastjet_array
 
 class UniformBinJetBuffer:
-    def __init__(self, channel:str, num_events:int, jet_type:str, subjet_radius:float, cut_limit:tuple, bin:int, num_bin_data:int):
+    def __init__(self, channel:str, num_events:int, jet_type:str, subjet_radius:float, cut_limit:tuple, bin:int, num_bin_data:int, **kwargs):
         self.channel       = channel
         self.num_events    = num_events
         self.jet_type      = jet_type
@@ -126,6 +126,7 @@ class UniformBinJetBuffer:
             self.buffer_events.append(bin_events)
             self.buffer_fastjet_events.append(bin_fastjet_events)
             print(f"Datalog: Complete bin ({i+1}/{bin}) | cut = {cut}")
+        print("-"*50)
 
     def get_uniform_bin_data(self):
         # create uniform size bin data
