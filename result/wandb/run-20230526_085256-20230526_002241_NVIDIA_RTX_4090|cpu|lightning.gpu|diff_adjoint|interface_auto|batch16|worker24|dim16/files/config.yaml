@@ -1,0 +1,79 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.12
+    cli_version: 0.15.3
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1685062376.957449
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      2:
+      - 1
+      - 41
+      - 55
+      3:
+      - 1
+      - 2
+      - 7
+      - 13
+      - 14
+      - 23
+      4: 3.9.12
+      5: 0.15.3
+      8:
+      - 5
+    m:
+    - 1: trainer/global_step
+      6:
+      - 3
+    - 1: epoch_time
+      5: 1
+      6:
+      - 1
+    - 1: epoch
+      5: 1
+      6:
+      - 1
+q_device:
+  desc: null
+  value: lightning.gpu
+q_diff:
+  desc: null
+  value: adjoint
+q_interface:
+  desc: null
+  value: auto
+num_qubits:
+  desc: null
+  value: 16
+num_reupload:
+  desc: null
+  value: 2
+num_qlayers:
+  desc: null
+  value: 1
+num_clayers:
+  desc: null
+  value: 2
+num_chidden:
+  desc: null
+  value: 64
+num_data:
+  desc: null
+  value: 512
+num_dim:
+  desc: null
+  value: 16
+batch_size:
+  desc: null
+  value: 16
+num_workers:
+  desc: null
+  value: 24

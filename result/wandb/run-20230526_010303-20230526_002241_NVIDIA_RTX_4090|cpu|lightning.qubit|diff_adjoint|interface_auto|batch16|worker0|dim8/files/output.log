@@ -1,0 +1,95 @@
+[34m[1mwandb[39m[22m: logging graph, to disable use `wandb.watch(log_graph=False)`
+GPU available: True (cuda), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/home/yianchen/.pyenv/versions/3.9.12/lib/python3.9/site-packages/lightning/pytorch/trainer/setup.py:176: PossibleUserWarning: GPU available but not used. Set `accelerator` and `devices` using `Trainer(accelerator='gpu', devices=1)`.
+  rank_zero_warn(
+  | Name          | Type              | Params
+----------------------------------------------------
+0 | model         | MLP               | 369
+1 | loss_function | BCEWithLogitsLoss | 0
+----------------------------------------------------
+369       Trainable params
+0         Non-trainable params
+369       Total params
+0.001     Total estimated model params size (MB)
+/home/yianchen/.pyenv/versions/3.9.12/lib/python3.9/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:430: PossibleUserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 12 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+Start testing cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker0|dim8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Epoch 2:  97%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍   | 31/32 [00:48<00:01,  1.55s/it, v_num=dim8]
+
+Epoch 2: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [00:49<00:00,  1.55s/it, v_num=dim8]

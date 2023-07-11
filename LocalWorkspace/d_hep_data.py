@@ -125,7 +125,7 @@ class UniformBinJetBuffer:
             assert len(bin_events) >= num_bin_data, f"num of bin_events smaller then num_bin_data: {len(bin_events)} < {num_bin_data}"
             self.buffer_events.append(bin_events)
             self.buffer_fastjet_events.append(bin_fastjet_events)
-            print(f"Datalog: Complete bin ({i+1}/{bin}) | cut = {cut}")
+            print(f"Datalog: Complete bin ({i+1}/{bin}) | cut = {cut}\n")
         print("-"*50)
 
     def get_uniform_bin_data(self):

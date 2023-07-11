@@ -1,0 +1,27 @@
+[34m[1mwandb[39m[22m: logging graph, to disable use `wandb.watch(log_graph=False)`
+GPU available: True (cuda), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/home/yianchen/.pyenv/versions/3.9.12/lib/python3.9/site-packages/lightning/pytorch/trainer/setup.py:176: PossibleUserWarning: GPU available but not used. Set `accelerator` and `devices` using `Trainer(accelerator='gpu', devices=1)`.
+  rank_zero_warn(
+  | Name          | Type              | Params
+----------------------------------------------------
+0 | model         | MLP               | 121
+1 | loss_function | BCEWithLogitsLoss | 0
+----------------------------------------------------
+121       Trainable params
+0         Non-trainable params
+121       Total params
+0.000     Total estimated model params size (MB)
+Start testing cpu|default.qubit|diff_best|interface_torch|batch64|worker12|dim4
+
+
+
+
+
+
+
+Epoch 2:  75%|████████████████████████████████████████████████████████████████████████████████████████▌                             | 6/8 [00:04<00:01,  1.48it/s, v_num=dim4]
+
+Epoch 2: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:05<00:00,  1.50it/s, v_num=dim4]

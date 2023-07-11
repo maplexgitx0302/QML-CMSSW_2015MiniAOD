@@ -1,0 +1,1 @@
+{"graph_0": {"_type": "graph-file", "sha256": "94493d622aaf1cd829ecce379493aa0e18e9f4320090a6c71187f920e0a361e7", "size": 800, "path": "media/graph/graph_0_summary_94493d622aaf1cd829ec.graph.json"}, "epoch_time": 50.27581024169922, "epoch": 2, "trainer/global_step": 23, "_timestamp": 1685038226.437632, "_runtime": 151.92053508758545, "_step": 2, "_wandb": {"runtime": 150}}

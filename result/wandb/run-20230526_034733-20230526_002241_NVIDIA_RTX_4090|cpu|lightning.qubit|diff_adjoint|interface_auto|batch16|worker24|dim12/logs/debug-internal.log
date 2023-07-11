@@ -1,0 +1,417 @@
+2023-05-26 03:47:34,593 INFO    StreamThr :27778 [internal.py:wandb_internal():86] W&B internal server running at pid: 27778, started at: 2023-05-26 03:47:34.592711
+2023-05-26 03:47:34,594 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status
+2023-05-26 03:47:34,596 INFO    WriterThread:27778 [datastore.py:open_for_write():85] open: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/run-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12.wandb
+2023-05-26 03:47:34,596 DEBUG   SenderThread:27778 [sender.py:send():375] send: header
+2023-05-26 03:47:34,597 DEBUG   SenderThread:27778 [sender.py:send():375] send: run
+2023-05-26 03:47:34,598 INFO    SenderThread:27778 [sender.py:_maybe_setup_resume():761] checking resume status for None/t_qml_time/20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12
+2023-05-26 03:47:35,243 INFO    SenderThread:27778 [dir_watcher.py:__init__():219] watching files in: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files
+2023-05-26 03:47:35,243 INFO    SenderThread:27778 [sender.py:_start_run_threads():1124] run started: 20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12 with start time 1685044053.660511
+2023-05-26 03:47:35,243 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: summary_record
+2023-05-26 03:47:35,244 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:47:35,246 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: check_version
+2023-05-26 03:47:35,246 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: check_version
+2023-05-26 03:47:35,416 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: run_start
+2023-05-26 03:47:35,416 DEBUG   HandlerThread:27778 [system_info.py:__init__():31] System info init
+2023-05-26 03:47:35,416 DEBUG   HandlerThread:27778 [system_info.py:__init__():46] System info init done
+2023-05-26 03:47:35,416 INFO    HandlerThread:27778 [system_monitor.py:start():181] Starting system monitor
+2023-05-26 03:47:35,417 INFO    SystemMonitor:27778 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-05-26 03:47:35,417 INFO    HandlerThread:27778 [system_monitor.py:probe():201] Collecting system info
+2023-05-26 03:47:35,417 INFO    SystemMonitor:27778 [interfaces.py:start():190] Started cpu monitoring
+2023-05-26 03:47:35,417 INFO    SystemMonitor:27778 [interfaces.py:start():190] Started disk monitoring
+2023-05-26 03:47:35,418 INFO    SystemMonitor:27778 [interfaces.py:start():190] Started gpu monitoring
+2023-05-26 03:47:35,418 INFO    SystemMonitor:27778 [interfaces.py:start():190] Started memory monitoring
+2023-05-26 03:47:35,419 INFO    SystemMonitor:27778 [interfaces.py:start():190] Started network monitoring
+2023-05-26 03:47:35,446 DEBUG   HandlerThread:27778 [system_info.py:probe():195] Probing system
+2023-05-26 03:47:35,447 DEBUG   HandlerThread:27778 [system_info.py:_probe_git():180] Probing git
+2023-05-26 03:47:35,471 DEBUG   HandlerThread:27778 [system_info.py:_probe_git():188] Probing git done
+2023-05-26 03:47:35,471 DEBUG   HandlerThread:27778 [system_info.py:probe():240] Probing system done
+2023-05-26 03:47:35,471 DEBUG   HandlerThread:27778 [system_monitor.py:probe():210] {'os': 'Linux-5.15.0-72-generic-x86_64-with-glibc2.31', 'python': '3.9.12', 'heartbeatAt': '2023-05-25T19:47:35.446602', 'startedAt': '2023-05-25T19:47:33.656785', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/home/yianchen/CMS_Open_Data_Workspace/CMSSW_7_6_7/src/LocalWorkspace/t.py', 'codePath': 'LocalWorkspace/t.py', 'git': {'remote': 'git@github.com:r08222011/QML_CMSSW_2015MiniAOD.git', 'commit': 'acbb9e9f69a822702fae4840be5feed95eb253b6'}, 'email': 'r08222011@gmail.com', 'root': '/home/yianchen/CMS_Open_Data_Workspace/CMSSW_7_6_7/src', 'host': 'CMS-RTX3080Ti', 'username': 'yianchen', 'executable': '/home/yianchen/.pyenv/versions/3.9.12/bin/python', 'cpu_count': 6, 'cpu_count_logical': 12, 'cpu_freq': {'current': 2393.1572499999997, 'min': 2200.0, 'max': 3700.0}, 'cpu_freq_per_core': [{'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 4517.887, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}, {'current': 2200.0, 'min': 2200.0, 'max': 3700.0}], 'disk': {'total': 937.3305015563965, 'used': 423.5499458312988}, 'gpu': 'NVIDIA GeForce RTX 3080 Ti', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3080 Ti', 'memory_total': 12884901888}], 'memory': {'total': 62.688743591308594}}
+2023-05-26 03:47:35,471 INFO    HandlerThread:27778 [system_monitor.py:probe():211] Finished collecting system info
+2023-05-26 03:47:35,471 INFO    HandlerThread:27778 [system_monitor.py:probe():214] Publishing system info
+2023-05-26 03:47:35,471 DEBUG   HandlerThread:27778 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-05-26 03:47:35,471 DEBUG   HandlerThread:27778 [system_info.py:_save_pip():67] Saving pip packages done
+2023-05-26 03:47:35,472 INFO    HandlerThread:27778 [system_monitor.py:probe():216] Finished publishing system info
+2023-05-26 03:47:35,472 DEBUG   SenderThread:27778 [sender.py:send():375] send: files
+2023-05-26 03:47:35,473 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-05-26 03:47:35,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:47:35,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:47:35,691 DEBUG   SenderThread:27778 [sender.py:send():375] send: telemetry
+2023-05-26 03:47:35,691 DEBUG   SenderThread:27778 [sender.py:send():375] send: metric
+2023-05-26 03:47:35,692 DEBUG   SenderThread:27778 [sender.py:send():375] send: telemetry
+2023-05-26 03:47:35,692 DEBUG   SenderThread:27778 [sender.py:send():375] send: metric
+2023-05-26 03:47:35,692 WARNING SenderThread:27778 [sender.py:send_metric():1329] Seen metric with glob (shouldn't happen)
+2023-05-26 03:47:35,692 DEBUG   SenderThread:27778 [sender.py:send():375] send: config
+2023-05-26 03:47:35,692 DEBUG   SenderThread:27778 [sender.py:send():375] send: config
+2023-05-26 03:47:35,692 DEBUG   SenderThread:27778 [sender.py:send():375] send: telemetry
+2023-05-26 03:47:35,696 DEBUG   SenderThread:27778 [sender.py:send():375] send: config
+2023-05-26 03:47:36,052 INFO    wandb-upload_0:27778 [upload_job.py:push():137] Uploaded file /tmp/tmpsdaz6qfjwandb/vebfyiyr-wandb-metadata.json
+2023-05-26 03:47:36,246 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-metadata.json
+2023-05-26 03:47:36,246 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/requirements.txt
+2023-05-26 03:47:36,246 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:47:36,246 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:36,393 DEBUG   SenderThread:27778 [sender.py:send():375] send: files
+2023-05-26 03:47:36,394 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json with policy now
+2023-05-26 03:47:36,394 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: summary_record
+2023-05-26 03:47:36,394 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:47:36,976 INFO    wandb-upload_0:27778 [upload_job.py:push():137] Uploaded file /tmp/tmpsdaz6qfjwandb/ljgg5av4-media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json
+2023-05-26 03:47:37,244 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:47:37,244 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json
+2023-05-26 03:47:37,244 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/media/graph
+2023-05-26 03:47:37,244 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_created():278] file/dir created: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/media
+2023-05-26 03:47:37,830 INFO    wandb-upload_0:27778 [upload_job.py:push():137] Uploaded file /tmp/tmpsdaz6qfjwandb/knorq70m-media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json
+2023-05-26 03:47:38,244 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:39,628 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:47:42,245 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:44,245 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:45,190 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:47:48,246 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:50,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:47:50,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:47:50,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:47:52,247 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:55,486 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:47:56,248 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:47:58,248 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:01,379 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:02,249 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:05,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:48:05,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:48:06,250 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:06,673 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:07,250 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/config.yaml
+2023-05-26 03:48:08,250 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:12,251 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:12,726 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:16,252 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:18,252 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:18,543 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:20,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:48:20,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:48:22,253 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:24,102 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:26,254 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:29,896 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:30,255 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:32,255 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:34,907 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:35,419 DEBUG   SystemMonitor:27778 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-05-26 03:48:35,420 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:48:35,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:48:35,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:48:36,256 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:40,257 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:40,314 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:42,258 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:46,226 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:46,258 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:50,259 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:50,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:48:50,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:48:51,683 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:48:54,260 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:56,261 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:48:57,583 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:00,262 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:03,423 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:04,262 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:05,420 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:49:05,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:49:05,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:49:08,263 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:08,839 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:10,264 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:14,265 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:14,764 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:18,265 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:20,266 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:20,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:49:20,478 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:49:20,685 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:24,267 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:26,115 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:26,529 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: partial_history
+2023-05-26 03:49:26,530 DEBUG   SenderThread:27778 [sender.py:send():375] send: metric
+2023-05-26 03:49:26,530 DEBUG   SenderThread:27778 [sender.py:send():375] send: metric
+2023-05-26 03:49:26,530 DEBUG   SenderThread:27778 [sender.py:send():375] send: history
+2023-05-26 03:49:26,530 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: summary_record
+2023-05-26 03:49:26,530 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:49:27,267 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:49:28,268 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:31,391 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:32,268 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:35,421 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:49:35,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:49:35,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:49:36,269 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:36,700 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:38,270 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:41,788 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:42,271 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:46,271 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:47,317 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:48,272 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/config.yaml
+2023-05-26 03:49:48,272 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:50,478 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:49:50,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:49:52,273 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:53,151 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:49:56,274 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:49:59,107 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:00,274 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:02,275 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:04,516 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:05,421 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:50:05,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:50:05,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:50:06,276 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:10,277 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:10,498 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:12,277 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:16,278 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:16,297 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:20,279 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:20,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:50:20,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:50:21,651 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:24,280 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:26,280 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:26,690 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:30,281 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:32,112 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:34,282 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:35,422 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:50:35,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:50:35,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:50:38,086 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:38,283 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:40,283 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:43,937 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:44,284 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:48,285 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:49,489 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:50,286 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:50,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:50:50,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:50:54,287 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:50:55,366 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:50:58,288 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:01,268 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:02,289 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:04,289 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:05,422 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:51:05,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:51:05,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:51:06,653 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:08,290 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:12,291 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:12,626 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:16,292 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:17,445 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: partial_history
+2023-05-26 03:51:17,446 DEBUG   SenderThread:27778 [sender.py:send():375] send: history
+2023-05-26 03:51:17,446 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: summary_record
+2023-05-26 03:51:17,446 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:51:18,293 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:51:18,293 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:18,447 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:20,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:51:20,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:51:22,294 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:24,423 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:26,295 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:30,207 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:30,295 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:34,296 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:35,422 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:51:35,423 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:35,479 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:51:35,479 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:51:36,297 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:40,298 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:40,579 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:44,299 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:46,299 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:46,489 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:50,300 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:50,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:51:50,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:51:51,692 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:54,301 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:51:56,717 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:51:58,302 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:00,302 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:02,198 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:04,303 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:05,423 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:52:05,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:52:05,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:52:07,978 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:08,304 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:10,304 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:13,899 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:14,305 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:18,306 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:19,306 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:20,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:52:20,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:52:22,307 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:24,308 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:25,193 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:28,309 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:30,948 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:32,310 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:34,310 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:35,423 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:52:35,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:52:35,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:52:36,674 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:38,311 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:42,289 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:42,312 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:46,313 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:48,127 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:48,314 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:50,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:52:50,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:52:52,315 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:53,698 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:52:56,316 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:58,316 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:52:59,307 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:53:02,317 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:53:05,224 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:53:05,424 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:53:05,480 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: stop_status
+2023-05-26 03:53:05,480 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: stop_status
+2023-05-26 03:53:06,318 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:53:07,628 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: partial_history
+2023-05-26 03:53:07,628 DEBUG   SenderThread:27778 [sender.py:send():375] send: history
+2023-05-26 03:53:07,629 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: summary_record
+2023-05-26 03:53:07,629 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:53:07,683 DEBUG   SenderThread:27778 [sender.py:send():375] send: telemetry
+2023-05-26 03:53:07,683 DEBUG   SenderThread:27778 [sender.py:send():375] send: exit
+2023-05-26 03:53:07,683 INFO    SenderThread:27778 [sender.py:send_exit():598] handling exit code: 0
+2023-05-26 03:53:07,683 INFO    SenderThread:27778 [sender.py:send_exit():600] handling runtime: 332
+2023-05-26 03:53:07,684 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:53:07,684 INFO    SenderThread:27778 [sender.py:send_exit():606] send defer
+2023-05-26 03:53:07,684 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,684 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 0
+2023-05-26 03:53:07,684 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,684 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 0
+2023-05-26 03:53:07,684 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 1
+2023-05-26 03:53:07,684 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,685 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 1
+2023-05-26 03:53:07,685 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,685 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 1
+2023-05-26 03:53:07,685 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 2
+2023-05-26 03:53:07,685 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,685 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 2
+2023-05-26 03:53:07,685 INFO    HandlerThread:27778 [system_monitor.py:finish():190] Stopping system monitor
+2023-05-26 03:53:07,685 DEBUG   SystemMonitor:27778 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2023-05-26 03:53:07,685 INFO    HandlerThread:27778 [interfaces.py:finish():202] Joined cpu monitor
+2023-05-26 03:53:07,686 DEBUG   SystemMonitor:27778 [system_monitor.py:_start():170] Publishing last batch of metrics
+2023-05-26 03:53:07,686 INFO    HandlerThread:27778 [interfaces.py:finish():202] Joined disk monitor
+2023-05-26 03:53:07,709 INFO    HandlerThread:27778 [interfaces.py:finish():202] Joined gpu monitor
+2023-05-26 03:53:07,709 INFO    HandlerThread:27778 [interfaces.py:finish():202] Joined memory monitor
+2023-05-26 03:53:07,709 INFO    HandlerThread:27778 [interfaces.py:finish():202] Joined network monitor
+2023-05-26 03:53:07,710 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 2
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 3
+2023-05-26 03:53:07,710 DEBUG   SenderThread:27778 [sender.py:send():375] send: stats
+2023-05-26 03:53:07,710 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,710 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 3
+2023-05-26 03:53:07,710 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 3
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 4
+2023-05-26 03:53:07,710 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,710 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 4
+2023-05-26 03:53:07,710 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 4
+2023-05-26 03:53:07,710 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 5
+2023-05-26 03:53:07,710 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,711 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 5
+2023-05-26 03:53:07,711 DEBUG   SenderThread:27778 [sender.py:send():375] send: summary
+2023-05-26 03:53:07,711 INFO    SenderThread:27778 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-05-26 03:53:07,711 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,711 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 5
+2023-05-26 03:53:07,711 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 6
+2023-05-26 03:53:07,711 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,711 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 6
+2023-05-26 03:53:07,711 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,711 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 6
+2023-05-26 03:53:07,715 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: status_report
+2023-05-26 03:53:07,955 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 7
+2023-05-26 03:53:07,955 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:07,955 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 7
+2023-05-26 03:53:07,956 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:07,956 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 7
+2023-05-26 03:53:08,319 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:53:08,319 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/config.yaml
+2023-05-26 03:53:08,320 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:53:08,684 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: poll_exit
+2023-05-26 03:53:10,171 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 8
+2023-05-26 03:53:10,171 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: poll_exit
+2023-05-26 03:53:10,171 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:10,172 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 8
+2023-05-26 03:53:10,172 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:10,172 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 8
+2023-05-26 03:53:10,176 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 9
+2023-05-26 03:53:10,176 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:10,176 DEBUG   SenderThread:27778 [sender.py:send():375] send: artifact
+2023-05-26 03:53:10,176 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 9
+2023-05-26 03:53:10,321 INFO    Thread-1478:27778 [dir_watcher.py:_on_file_modified():295] file/dir modified: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:53:11,237 INFO    SenderThread:27778 [sender.py:send_artifact():1474] sent artifact job-git_github.com_r08222011_QML_CMSSW_2015MiniAOD.git_LocalWorkspace_t.py - {'id': 'QXJ0aWZhY3Q6NDY2NTEyNTM3', 'digest': 'dab843dac46bbae819fbfc808f8dd1c5', 'state': 'COMMITTED', 'aliases': [{'artifactCollectionName': 'job-git_github.com_r08222011_QML_CMSSW_2015MiniAOD.git_LocalWorkspace_t.py', 'alias': 'latest'}, {'artifactCollectionName': 'job-git_github.com_r08222011_QML_CMSSW_2015MiniAOD.git_LocalWorkspace_t.py', 'alias': 'v2'}], 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjYzODg4MjA3', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6NDY2NTEyNTM3', 'versionIndex': 2}}, 'version': 'v2'}
+2023-05-26 03:53:11,237 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:11,237 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 9
+2023-05-26 03:53:11,237 INFO    SenderThread:27778 [dir_watcher.py:finish():365] shutting down directory watcher
+2023-05-26 03:53:11,322 INFO    SenderThread:27778 [dir_watcher.py:finish():395] scan: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files
+2023-05-26 03:53:11,322 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-metadata.json wandb-metadata.json
+2023-05-26 03:53:11,322 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/requirements.txt requirements.txt
+2023-05-26 03:53:11,322 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log output.log
+2023-05-26 03:53:11,322 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/config.yaml config.yaml
+2023-05-26 03:53:11,323 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json wandb-summary.json
+2023-05-26 03:53:11,333 INFO    SenderThread:27778 [dir_watcher.py:finish():409] scan save: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json media/graph/graph_0_summary_a1ad546e149db8dbcdb7.graph.json
+2023-05-26 03:53:11,333 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 10
+2023-05-26 03:53:11,336 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:11,337 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 10
+2023-05-26 03:53:11,337 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:11,337 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 10
+2023-05-26 03:53:11,337 INFO    SenderThread:27778 [file_pusher.py:finish():167] shutting down file pusher
+2023-05-26 03:53:11,930 INFO    wandb-upload_3:27778 [upload_job.py:push():137] Uploaded file ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/wandb-summary.json
+2023-05-26 03:53:11,931 INFO    wandb-upload_2:27778 [upload_job.py:push():137] Uploaded file ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/config.yaml
+2023-05-26 03:53:11,932 INFO    wandb-upload_1:27778 [upload_job.py:push():137] Uploaded file ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/requirements.txt
+2023-05-26 03:53:11,949 INFO    wandb-upload_0:27778 [upload_job.py:push():137] Uploaded file ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/files/output.log
+2023-05-26 03:53:12,150 INFO    Thread-1477:27778 [sender.py:transition_state():626] send defer: 11
+2023-05-26 03:53:12,150 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:12,150 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 11
+2023-05-26 03:53:12,151 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:12,151 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 11
+2023-05-26 03:53:12,151 INFO    SenderThread:27778 [file_pusher.py:join():172] waiting for file pusher
+2023-05-26 03:53:12,151 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 12
+2023-05-26 03:53:12,151 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:12,151 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 12
+2023-05-26 03:53:12,152 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:12,152 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 12
+2023-05-26 03:53:12,823 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 13
+2023-05-26 03:53:12,823 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:12,824 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 13
+2023-05-26 03:53:12,824 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:12,824 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 13
+2023-05-26 03:53:12,824 INFO    SenderThread:27778 [sender.py:transition_state():626] send defer: 14
+2023-05-26 03:53:12,824 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: defer
+2023-05-26 03:53:12,825 DEBUG   SenderThread:27778 [sender.py:send():375] send: final
+2023-05-26 03:53:12,825 INFO    HandlerThread:27778 [handler.py:handle_request_defer():170] handle defer: 14
+2023-05-26 03:53:12,825 DEBUG   SenderThread:27778 [sender.py:send():375] send: footer
+2023-05-26 03:53:12,825 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: defer
+2023-05-26 03:53:12,825 INFO    SenderThread:27778 [sender.py:send_request_defer():622] handle sender defer: 14
+2023-05-26 03:53:12,826 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: poll_exit
+2023-05-26 03:53:12,826 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: server_info
+2023-05-26 03:53:12,826 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: get_summary
+2023-05-26 03:53:12,827 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: poll_exit
+2023-05-26 03:53:12,827 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: sampled_history
+2023-05-26 03:53:12,827 DEBUG   SenderThread:27778 [sender.py:send_request():402] send_request: server_info
+2023-05-26 03:53:13,022 DEBUG   HandlerThread:27778 [handler.py:handle_request():144] handle_request: shutdown
+2023-05-26 03:53:13,022 INFO    HandlerThread:27778 [handler.py:finish():842] shutting down handler
+2023-05-26 03:53:13,827 INFO    WriterThread:27778 [datastore.py:close():298] close: ./result/wandb/run-20230526_034733-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12/run-20230526_002241_NVIDIA_RTX_4090|cpu|lightning.qubit|diff_adjoint|interface_auto|batch16|worker24|dim12.wandb
+2023-05-26 03:53:14,022 INFO    SenderThread:27778 [sender.py:finish():1550] shutting down sender
+2023-05-26 03:53:14,022 INFO    SenderThread:27778 [file_pusher.py:finish():167] shutting down file pusher
+2023-05-26 03:53:14,022 INFO    SenderThread:27778 [file_pusher.py:join():172] waiting for file pusher
