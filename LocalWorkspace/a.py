@@ -202,14 +202,14 @@ def train(model, data_module, train_info):
 
 # %%
 data_abbrev = {"ZprimeToZhToZinvhbb":"Zinvhbb", "ZprimeToZhToZlephbb":"Zlephbb", "QCD_HT1500to2000":"QCD2000", "QCD_HT2000toInf":"QCDinf"}
-data_info_list = [
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-]
 
-for R, num_data in list(product([1, 0.5, 0.1], [7500, 5000, 2500, 1000, 500])):
+for R, num_bin_data in list(product([1, 0.5, 0.1], [7500, 5000, 2500, 1000, 500])):
+    data_info_list = [
+        {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
+        {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
+        {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
+        {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
+    ]
     for data_info in data_info_list:
         sig_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["sig"], num_events=50000, **data_info)
         bkg_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["bkg"], num_events=50000, **data_info)
