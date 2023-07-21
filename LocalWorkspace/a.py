@@ -207,22 +207,12 @@ data_info_list = [
     {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
     {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
     {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":0.5 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":0.5 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":0.5 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":0.5 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":0.1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":0.1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":0.1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
-    {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":0.1 ,"cut_limit":None, "bin":1, "num_bin_data":5000},
 ]
 
-for data_info in data_info_list:
-    sig_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["sig"], num_events=50000, **data_info)
-    bkg_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["bkg"], num_events=50000, **data_info)
-    for gh, gl, mh, ml in [(0, 0, 0, 0)]+list(product([6, 12, 24, 48], [1, 2, 4], [6, 12, 24, 48], [1, 2, 4])):
+for R, num_data in list(product([1, 0.5, 0.1], [7500, 5000, 2500, 1000, 500])):
+    for data_info in data_info_list:
+        sig_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["sig"], num_events=50000, **data_info)
+        bkg_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["bkg"], num_events=50000, **data_info)
         for rnd_seed in range(3):
             L.seed_everything(rnd_seed)
             sig_events  = sig_buffer.get_uniform_bin_data()
@@ -231,18 +221,17 @@ for data_info in data_info_list:
 
             # classical
             preprocess_mode = ""
-            gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, gh, gl
-            model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers, mlp_hidden=mh, mlp_layers=ml)
-            # model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
+            gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
+            model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
             data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
             train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers}_mh{mh}_ml{ml} | {data_suffix}"
+            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers} | {data_suffix}"
             train_info.update(data_info)
             train(model, data_module, train_info)
 
             # classical with normalized data
             # preprocess_mode = "normalize"
-            # gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, gh, gl
+            # gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
             # model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers, mlp_hidden=mh, mlp_layers=ml)
             # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
             # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
