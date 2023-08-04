@@ -9,7 +9,7 @@ import m_nn
 import m_lightning
 
 # data
-import d_hep_data
+import d_mg5_data
 import awkward as ak
 
 # qml
@@ -51,9 +51,10 @@ if os.path.isdir(root_dir) == False:
 cf = {}
 cf["time"]     = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 cf["wandb"]    = True
-cf["project"]  = "g_eflow_2pcgnn"
+cf["project"]  = "g_vz_eflow_2pcgnn"
 
 # traning configuration
+cf["num_rnd_round"]     = 3
 cf["num_train_ratio"]   = 0.8
 cf["batch_size"]        = 64
 cf["num_workers"]       = 0
@@ -78,13 +79,13 @@ class JetDataModule(pl.LightningDataModule):
     def _preprocess(self, events, y, mode):
         # "_" prefix means that it is a fastjet feature
         if mode == "normalize":
-            f1 = np.arctan(events["_pt"] / events["pt"])
-            f2 = events["_delta_eta"]
-            f3 = events["_delta_phi"]
+            f1 = np.arctan(events["fast_pt"] / events["fatjet_pt"])
+            f2 = events["fast_delta_eta"]
+            f3 = events["fast_delta_phi"]
         elif mode == "":
-            f1 = events["_pt"]
-            f2 = events["_delta_eta"]
-            f3 = events["_delta_phi"]
+            f1 = events["fast_pt"]
+            f2 = events["fast_delta_eta"]
+            f3 = events["fast_delta_phi"]
         arrays = ak.zip([f1, f2, f3])
         arrays = arrays.to_list()
         events = [torch.tensor(arrays[i], dtype=torch.float32) for i in range(len(arrays))]
@@ -201,80 +202,80 @@ def train(model, data_module, train_info):
         wandb.finish()
 
 # %%
-data_abbrev = {"ZprimeToZhToZinvhbb":"Zinvhbb", "ZprimeToZhToZlephbb":"Zlephbb", "QCD_HT1500to2000":"QCD2000", "QCD_HT2000toInf":"QCDinf"}
+data_info = {"sig": "VzToZh", "bkg": "VzToQCD", "cut": (800, 1000), "bin":10}
+sig_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["sig"], cut_pt=data_info["cut"])
+bkg_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["bkg"], cut_pt=data_info["cut"])
 
-for R, num_bin_data in list(product([1, 0.5, 0.1], [7500, 5000, 2500, 1000, 500])):
-    data_info_list = [
-        {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
-        {"sig":"ZprimeToZhToZinvhbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
-        {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT2000toInf", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
-        {"sig":"ZprimeToZhToZlephbb", "bkg":"QCD_HT1500to2000", "jet_type":"fatjet", "subjet_radius":R ,"cut_limit":None, "bin":1, "num_bin_data":num_bin_data},
-    ]
-    for data_info in data_info_list:
-        sig_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["sig"], num_events=50000, **data_info)
-        bkg_buffer = d_hep_data.UniformBinJetBuffer(channel=data_info["bkg"], num_events=50000, **data_info)
-        for rnd_seed in range(3):
-            L.seed_everything(rnd_seed)
-            sig_events  = sig_buffer.get_uniform_bin_data()
-            bkg_events  = bkg_buffer.get_uniform_bin_data()
-            data_suffix = f"{data_abbrev[data_info['sig']]}_{data_abbrev[data_info['bkg']]}_cut{data_info['cut_limit']}_bin{data_info['bin']}-{data_info['num_bin_data']}_R{data_info['subjet_radius']}"
+for subjet_radius, num_bin_data in product([0.1, 0.2, 0.4], [100, 1000]):
+    data_info["subjet_radius"] = subjet_radius
+    data_info["num_bin_data"]  = num_bin_data
+    sig_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
+    bkg_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
+    
+    for rnd_seed in range(cf["num_rnd_round"]):
+        L.seed_everything(rnd_seed)
+        sig_events  = sig_fatjet_events.generate_uniform_pt_events(bin=data_info["bin"], num_bin_data=data_info["num_bin_data"])
+        bkg_events  = bkg_fatjet_events.generate_uniform_pt_events(bin=data_info["bin"], num_bin_data=data_info["num_bin_data"])
+        data_suffix = f"{data_info['sig']}_{data_info['bkg']}_cut{data_info['cut']}_bin{data_info['bin']}-{data_info['num_bin_data']}_R{data_info['subjet_radius']}"
 
-            # classical
-            preprocess_mode = ""
-            gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
+        # classical
+        preprocess_mode = ""
+        for model_structure_tuple in product([(0,0),(12,1),(12,2),(48,1),(48,2)], [(0,0),(12,1),(12,2),(48,1),(48,2)]):
+            (gh, gl), (mh, ml) = model_structure_tuple
+            gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, gh, gl
             model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
             data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
             train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers} | {data_suffix}"
+            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers}_mh{mh}_ml{ml} | {data_suffix}"
             train_info.update(data_info)
             train(model, data_module, train_info)
 
-            # classical with normalized data
-            # preprocess_mode = "normalize"
-            # gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
-            # model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers, mlp_hidden=mh, mlp_layers=ml)
-            # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers} | {data_suffix}"
-            # train_info.update(data_info)
-            # train(model, data_module, train_info)
+        # classical with normalized data
+        # preprocess_mode = "normalize"
+        # gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
+        # model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers, mlp_hidden=mh, mlp_layers=ml)
+        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
+        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers} | {data_suffix}"
+        # train_info.update(data_info)
+        # train(model, data_module, train_info)
 
-            # # quantum angle encoding
-            # preprocess_mode = "normalize"
-            # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
-            # model = QuantumAngle2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
-            # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
-            # train_info.update(data_info)
-            # # train(model, data_module, train_info)
+        # # quantum angle encoding
+        # preprocess_mode = "normalize"
+        # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
+        # model = QuantumAngle2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
+        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
+        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
+        # train_info.update(data_info)
+        # # train(model, data_module, train_info)
 
-            # # quantum angle encoding with elementwise linear
-            # preprocess_mode = "normalize"
-            # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
-            # model = QuantumElementwiseAngle2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
-            # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
-            # train_info.update(data_info)
-            # # train(model, data_module, train_info)
+        # # quantum angle encoding with elementwise linear
+        # preprocess_mode = "normalize"
+        # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
+        # model = QuantumElementwiseAngle2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
+        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
+        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
+        # train_info.update(data_info)
+        # # train(model, data_module, train_info)
 
-            # # quantum IQP encoding
-            # preprocess_mode = "normalize"
-            # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
-            # model = QuantumIQP2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
-            # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
-            # train_info.update(data_info)
-            # # train(model, data_module, train_info)
+        # # quantum IQP encoding
+        # preprocess_mode = "normalize"
+        # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
+        # model = QuantumIQP2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
+        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
+        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
+        # train_info.update(data_info)
+        # # train(model, data_module, train_info)
 
-            # # quantum IQP encoding with elementwise linear
-            # preprocess_mode = "normalize"
-            # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
-            # model = QuantumElementwiseIQP2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
-            # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
-            # train_info.update(data_info)
-            # # train(model, data_module, train_info)
+        # # quantum IQP encoding with elementwise linear
+        # preprocess_mode = "normalize"
+        # gnn_qubits, gnn_layers, gnn_reupload, gnn_measurements = 6, 2, 0, [[i, "Z"] for i in range(6)]
+        # model = QuantumElementwiseIQP2PCGNN(gnn_qubits=gnn_qubits, gnn_layers=gnn_layers, gnn_reupload=gnn_reupload, gnn_measurements=gnn_measurements)
+        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
+        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_q{gnn_qubits}_gl{gnn_layers}_gr{gnn_reupload} | {data_suffix}"
+        # train_info.update(data_info)
+        # # train(model, data_module, train_info)
