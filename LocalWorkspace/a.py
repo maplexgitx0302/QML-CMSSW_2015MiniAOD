@@ -202,11 +202,11 @@ def train(model, data_module, train_info):
         wandb.finish()
 
 # %%
-data_info = {"sig": "VzToZh", "bkg": "VzToQCD", "cut": (800, 1000), "bin":10}
+data_info = {"sig": "VzToZh_500k", "bkg": "VzToQCD_500k", "cut": (800, 1000), "bin":10}
 sig_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["sig"], cut_pt=data_info["cut"])
 bkg_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["bkg"], cut_pt=data_info["cut"])
 
-for subjet_radius, num_bin_data in product([0.1, 0.2, 0.4], [100, 1000]):
+for gnn_out, subjet_radius, num_bin_data in product([18,64,128,256], [0.1], [10000]):
     data_info["subjet_radius"] = subjet_radius
     data_info["num_bin_data"]  = num_bin_data
     sig_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
@@ -220,9 +220,9 @@ for subjet_radius, num_bin_data in product([0.1, 0.2, 0.4], [100, 1000]):
 
         # classical
         preprocess_mode = ""
-        for model_structure_tuple in product([(0,0),(12,1),(12,2),(48,1),(48,2)], [(0,0),(12,1),(12,2),(48,1),(48,2)]):
+        for model_structure_tuple in product([(0,0),(48,1),(48,2),(48,3),(96,1),(96,2),(96,3)], [(0,0),(12,1),(12,2)]):
             (gh, gl), (mh, ml) = model_structure_tuple
-            gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, gh, gl
+            gnn_in, gnn_hidden, gnn_layers = 6, gh, gl
             model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
             data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
             train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}

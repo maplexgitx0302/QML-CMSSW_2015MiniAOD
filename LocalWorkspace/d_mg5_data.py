@@ -12,7 +12,7 @@ _array   = ak.Array([{"px": 0.1, "py": 0.2, "pz": 0.3, "E": 0.4},])
 fastjet.ClusterSequence(_array, _jet_def)
 
 class FatJetEvents:
-    def __init__(self, channel:str, cut_pt:tuple[float,float]=None, subjet_radius:float=None):
+    def __init__(self, channel:str, cut_pt:tuple[float,float], subjet_radius:float=None):
         # read MadGraph5 root file through 'uproot'
         dir_path  = os.path.expanduser(f"~/CMS_Open_Data_Workspace/CMSSW_7_6_7/src/LocalWorkspace/data/{channel}")
         root_path = f"{dir_path}/Events/run_01/tag_1_delphes_events.root"
