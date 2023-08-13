@@ -206,7 +206,7 @@ data_info = {"sig": "VzToZh_500k", "bkg": "VzToQCD_500k", "cut": (800, 1000), "b
 sig_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["sig"], cut_pt=data_info["cut"])
 bkg_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["bkg"], cut_pt=data_info["cut"])
 
-for gnn_out, subjet_radius, num_bin_data in product([18,64,128,256], [0.1], [10000]):
+for gnn_out, subjet_radius, num_bin_data in product([18,48,256], [0.1], [2000, 5000]):
     data_info["subjet_radius"] = subjet_radius
     data_info["num_bin_data"]  = num_bin_data
     sig_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
@@ -220,25 +220,31 @@ for gnn_out, subjet_radius, num_bin_data in product([18,64,128,256], [0.1], [100
 
         # classical
         preprocess_mode = ""
-        for model_structure_tuple in product([(0,0),(48,1),(48,2),(48,3),(96,1),(96,2),(96,3)], [(0,0),(12,1),(12,2)]):
-            (gh, gl), (mh, ml) = model_structure_tuple
+        for (gh, gl) in [(0,0),(12,1),(12,2),(12,3),(12,4),(48,1),(48,2),(48,3),(48,4),(256,1),(256,2),(256,3),(256,4)]:
             gnn_in, gnn_hidden, gnn_layers = 6, gh, gl
             model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
             data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-            train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers}_mh{mh}_ml{ml} | {data_suffix}"
+            train_info = {
+                "rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode,
+                "gnn_hidden":gh, "gnn_layers":gl, "gnn_out":gnn_out, "mlp_hidden":0, "mlp_layers":0,
+                }
+            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers}_mh0_ml0 | {data_suffix}"
             train_info.update(data_info)
             train(model, data_module, train_info)
 
         # classical with normalized data
-        # preprocess_mode = "normalize"
-        # gnn_in, gnn_out, gnn_hidden, gnn_layers = 6, 6, 0, 0
-        # model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers, mlp_hidden=mh, mlp_layers=ml)
-        # data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
-        # train_info = {"rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode}
-        # train_info["group_rnd"]  = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers} | {data_suffix}"
-        # train_info.update(data_info)
-        # train(model, data_module, train_info)
+        preprocess_mode = "normalize"
+        for (gh, gl) in [(0,0),(12,1),(12,2),(12,3),(12,4),(48,1),(48,2),(48,3),(48,4),(256,1),(256,2),(256,3),(256,4)]:
+            gnn_in, gnn_hidden, gnn_layers = 6, gh, gl
+            model = Classical2PCGNN(gnn_in=gnn_in, gnn_out=gnn_out, gnn_hidden=gnn_hidden, gnn_layers=gnn_layers)
+            data_module = JetDataModule(sig_events, bkg_events, preprocess_mode)
+            train_info = {
+                "rnd_seed":rnd_seed, "model_name":model.__class__.__name__, "preprocess_mode":preprocess_mode,
+                "gnn_hidden":gh, "gnn_layers":gl, "gnn_out":gnn_out, "mlp_hidden":0, "mlp_layers":0,
+                }
+            train_info["group_rnd"] = f"{model.__class__.__name__}_{preprocess_mode}_go{gnn_out}_gh{gnn_hidden}_gl{gnn_layers}_mh0_ml0 | {data_suffix}"
+            train_info.update(data_info)
+            train(model, data_module, train_info)
 
         # # quantum angle encoding
         # preprocess_mode = "normalize"
