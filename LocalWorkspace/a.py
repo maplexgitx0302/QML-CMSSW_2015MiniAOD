@@ -202,15 +202,12 @@ def train(model, data_module, train_info):
         wandb.finish()
 
 # %%
-data_info = {"sig": "VzToZh_500k", "bkg": "VzToQCD_500k", "cut": (800, 1000), "bin":10}
-sig_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["sig"], cut_pt=data_info["cut"])
-bkg_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["bkg"], cut_pt=data_info["cut"])
+data_info = {"sig": "VzToZhToVevebb", "bkg": "VzToQCD", "cut": (800, 1000), "bin":10, "subjet_radius":0.1}
+sig_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["sig"], cut_pt=data_info["cut"], subjet_radius=data_info["subjet_radius"])
+bkg_fatjet_events = d_mg5_data.FatJetEvents(channel=data_info["bkg"], cut_pt=data_info["cut"], subjet_radius=data_info["subjet_radius"])
 
-for gnn_out, subjet_radius, num_bin_data in product([18,48,256], [0.1], [2000, 5000]):
-    data_info["subjet_radius"] = subjet_radius
+for gnn_out, num_bin_data in product([18,48,256], [2000, 5000]):
     data_info["num_bin_data"]  = num_bin_data
-    sig_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
-    bkg_fatjet_events.generate_fastjet_events(subjet_radius=subjet_radius)
     
     for rnd_seed in range(cf["num_rnd_round"]):
         L.seed_everything(rnd_seed)
