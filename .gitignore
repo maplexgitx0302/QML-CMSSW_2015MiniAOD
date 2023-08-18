@@ -4,5 +4,5 @@
 *lightning_logs
 */result/
 */data/
-*/LocalWorkspace/wandb/
+*/wandb
 */g_4vec_2pcqnn*.txt
